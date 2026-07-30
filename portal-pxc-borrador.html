@@ -1,0 +1,684 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Portal PxC — Solicitudes</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ink:#0a0a0a; --ink-soft:#4a4a4a; --ink-faint:#8a8a8a;
+    --paper:#ffffff; --paper-soft:#fafafa;
+    --line:#e7e7e7; --line-soft:#f0f0f0;
+    --pink:#E00086; --pink-soft:#fdeaf5;
+    --radius:10px;
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { font-family:'Manrope',sans-serif; background:var(--paper); color:var(--ink); min-height:100vh; -webkit-font-smoothing:antialiased; }
+
+  /* ===== Topbar ===== */
+  .topbar { display:flex; align-items:center; justify-content:flex-end; gap:10px; padding:18px 40px; border-bottom:1px solid var(--line); position:sticky; top:0; background:rgba(255,255,255,0.92); backdrop-filter:blur(8px); z-index:100; }
+  .btn-nav { font-family:'Manrope',sans-serif; font-weight:700; font-size:13px; padding:9px 18px; border-radius:50px; cursor:pointer; transition:all 0.18s; }
+  .btn-nav-ghost { background:transparent; border:1.5px solid var(--line); color:var(--ink); }
+  .btn-nav-ghost:hover { border-color:var(--ink); }
+  .btn-nav-solid { background:var(--ink); border:1.5px solid var(--ink); color:white; }
+  .btn-nav-solid:hover { background:var(--pink); border-color:var(--pink); }
+
+  /* ===== Hero ===== */
+  .hero { max-width:720px; margin:0 auto; padding:72px 32px 56px; text-align:center; }
+  .hero-logo { height:110px; width:auto; margin:0 auto 36px; display:block; }
+  .hero h1 { font-weight:800; font-size:clamp(30px,4.6vw,44px); line-height:1.15; letter-spacing:-0.02em; color:var(--ink); }
+  .hero-rule { width:46px; height:3px; background:var(--pink); border-radius:3px; margin:26px auto; }
+  .hero p { font-size:15.5px; color:var(--ink-soft); line-height:1.65; max-width:480px; margin:0 auto; font-weight:500; }
+  @media(max-width:560px){ .hero-logo{height:80px;margin-bottom:26px} }
+
+  .container { max-width:720px; margin:0 auto; padding:0 32px 100px; }
+
+  /* ===== Tabs (editorial underline style) ===== */
+  .tabs-bar { display:grid; grid-template-columns:repeat(4,1fr); gap:10px; margin-bottom:36px; }
+  .tab-btn { text-align:center; background:var(--paper-soft); border:1.5px solid var(--line); border-radius:12px; padding:13px 10px; font-family:'Manrope',sans-serif; font-weight:700; font-size:13px; color:var(--ink-soft); cursor:pointer; transition:all 0.18s; }
+  .tab-btn:hover { border-color:var(--pink); color:var(--ink); }
+  .tab-btn.active { background:var(--ink); border-color:var(--ink); color:white; }
+  @media(max-width:560px){ .tabs-bar{grid-template-columns:repeat(2,1fr);} }
+
+  /* ===== Card / form ===== */
+  .card { background:var(--paper); border-radius:var(--radius); padding:0; animation:fadeUp 0.3s ease both; }
+  @keyframes fadeUp { from{opacity:0;transform:translateY(10px)} to{opacity:1;transform:translateY(0)} }
+  .card-title { font-weight:800; font-size:22px; letter-spacing:-0.01em; color:var(--ink); margin-bottom:8px; }
+  .card-desc { font-size:14px; color:var(--ink-soft); line-height:1.6; margin-bottom:36px; font-weight:500; }
+
+  .btn-ghost { display:inline-flex; align-items:center; gap:7px; background:transparent; color:var(--ink); border:1.5px solid var(--line); border-radius:50px; font-family:'Manrope',sans-serif; font-weight:700; font-size:12px; padding:9px 18px; cursor:pointer; margin-bottom:28px; transition:all 0.2s; }
+  .btn-ghost:hover { border-color:var(--ink); }
+
+  .field-group { margin-bottom:22px; }
+  .field-row { display:grid; grid-template-columns:1fr 1fr; gap:16px; }
+  .field-label { display:block; font-size:11.5px; font-weight:700; color:var(--ink); text-transform:uppercase; letter-spacing:0.6px; margin-bottom:8px; }
+  .field-label .opt { text-transform:none; color:var(--ink-faint); font-weight:500; letter-spacing:0; }
+  .field-input { width:100%; padding:13px 14px; border:1.5px solid var(--line); border-radius:8px; font-family:'Manrope',sans-serif; font-size:14px; font-weight:500; color:var(--ink); transition:border-color 0.15s; background:var(--paper-soft); }
+  .field-input::placeholder { color:var(--ink-faint); font-weight:500; }
+  .field-input:focus { outline:none; border-color:var(--pink); background:var(--paper); box-shadow:0 0 0 3px var(--pink-soft); }
+  textarea.field-input { resize:vertical; min-height:96px; }
+  select.field-input { appearance:none; background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8'%3E%3Cpath fill='%238a8a8a' d='M0 0l6 8 6-8z'/%3E%3C/svg%3E"); background-repeat:no-repeat; background-position:right 16px center; padding-right:36px; }
+
+  .file-field { display:flex; align-items:center; border:1.5px dashed var(--line); border-radius:8px; overflow:hidden; background:var(--paper-soft); cursor:pointer; transition:border-color 0.15s; }
+  .file-field:hover { border-color:var(--pink); }
+  .file-field-btn { background:var(--ink); color:white; font-family:'Manrope',sans-serif; font-weight:700; font-size:12px; padding:12px 16px; white-space:nowrap; }
+  .file-field-name { padding:12px 14px; font-size:13px; color:var(--ink-faint); font-weight:500; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; flex:1; }
+  .file-field input[type=file] { display:none; }
+
+  .btn-primary { width:100%; padding:16px; background:var(--ink); color:white; border:none; border-radius:8px; font-family:'Manrope',sans-serif; font-weight:700; font-size:14.5px; letter-spacing:0.2px; cursor:pointer; transition:all 0.18s; margin-top:8px; }
+  .btn-primary:hover { background:var(--pink); }
+
+  .notice { background:var(--paper-soft); border:1px solid var(--line); border-left:3px solid var(--pink); border-radius:0 8px 8px 0; padding:14px 18px; margin:0 0 28px; font-size:12.5px; color:var(--ink-soft); font-weight:600; line-height:1.55; }
+
+  .success-toast { display:none; align-items:center; gap:10px; background:var(--paper-soft); border:1px solid var(--line); border-radius:8px; padding:14px 18px; margin-top:18px; font-size:13px; color:var(--ink); font-weight:700; }
+  .success-toast .st-icon { width:22px; height:22px; border-radius:50%; background:var(--pink); color:white; display:flex; align-items:center; justify-content:center; font-size:12px; flex-shrink:0; }
+
+  .divider { height:1px; background:var(--line); margin:0 0 32px; }
+
+  .page { display:none; } .page.active { display:block; }
+
+  /* ===== Monto chips (vales prepagados) ===== */
+  .monto-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:10px; margin-bottom:14px; }
+  .monto-chip { border:1.5px solid var(--line); border-radius:10px; padding:16px 8px; text-align:center; cursor:pointer; background:var(--paper-soft); transition:all 0.15s; user-select:none; }
+  .monto-chip:hover { border-color:var(--pink); }
+  .monto-chip.selected { border-color:var(--pink); background:var(--pink-soft); box-shadow:0 0 0 3px var(--pink-soft); }
+  .monto-chip .amount { display:block; font-weight:800; font-size:18px; color:var(--ink); letter-spacing:-0.01em; }
+  .monto-chip.selected .amount { color:var(--pink); }
+  .monto-chip .currency { display:block; font-size:10px; font-weight:700; color:var(--ink-faint); text-transform:uppercase; letter-spacing:0.6px; margin-top:3px; }
+  .monto-custom-wrap { display:none; margin:-2px 0 18px; }
+  .total-box { display:none; align-items:center; justify-content:space-between; background:var(--ink); border-radius:8px; padding:15px 18px; margin:-2px 0 26px; }
+  .total-box .total-label { font-size:12px; font-weight:700; color:rgba(255,255,255,0.65); text-transform:uppercase; letter-spacing:0.6px; }
+  .total-box .total-amount { font-size:19px; font-weight:800; color:white; }
+  @media(max-width:420px){ .monto-grid{grid-template-columns:repeat(2,1fr)} }
+
+  /* ===== Auth modal ===== */
+  .modal-overlay { display:none; position:fixed; inset:0; background:rgba(10,10,10,0.55); backdrop-filter:blur(2px); z-index:200; align-items:center; justify-content:center; padding:20px; }
+  .modal-overlay.open { display:flex; }
+  .modal-box { background:var(--paper); border-radius:16px; width:100%; max-width:400px; padding:36px 32px 32px; position:relative; animation:modalIn 0.22s ease both; box-shadow:0 20px 60px rgba(0,0,0,0.25); }
+  @keyframes modalIn { from{opacity:0;transform:translateY(10px) scale(0.98)} to{opacity:1;transform:translateY(0) scale(1)} }
+  .modal-close { position:absolute; top:16px; right:16px; width:30px; height:30px; border-radius:50%; border:none; background:var(--paper-soft); color:var(--ink-soft); font-size:16px; cursor:pointer; display:flex; align-items:center; justify-content:center; transition:background 0.15s; }
+  .modal-close:hover { background:var(--line-soft); }
+  .modal-logo { height:30px; width:auto; display:block; margin:0 auto 22px; }
+  .modal-tabs { display:flex; border-bottom:1px solid var(--line); margin-bottom:26px; }
+  .modal-tab { flex:1; text-align:center; background:none; border:none; padding:10px 0 14px; font-family:'Manrope',sans-serif; font-weight:700; font-size:13.5px; color:var(--ink-faint); cursor:pointer; position:relative; }
+  .modal-tab::after { content:''; position:absolute; left:0; right:0; bottom:-1px; height:2px; background:transparent; transition:background 0.2s; }
+  .modal-tab.active { color:var(--ink); }
+  .modal-tab.active::after { background:var(--pink); }
+  .modal-title { font-weight:800; font-size:19px; letter-spacing:-0.01em; text-align:center; margin-bottom:6px; }
+  .modal-sub { font-size:13px; color:var(--ink-soft); text-align:center; margin-bottom:24px; font-weight:500; }
+  .auth-form { display:none; }
+  .auth-form.active { display:block; }
+  .auth-forgot { display:block; text-align:right; font-size:12px; font-weight:600; color:var(--ink-faint); text-decoration:none; margin:-10px 0 18px; }
+  .auth-forgot:hover { color:var(--pink); }
+
+  .history-icon { width:52px; height:52px; border-radius:50%; background:var(--pink-soft); display:flex; align-items:center; justify-content:center; font-size:22px; margin:0 auto 18px; }
+
+  /* ===== Footer ===== */
+  .site-footer { border-top:1px solid var(--line); margin-top:8px; padding:28px 40px; }
+  .footer-inner { max-width:720px; margin:0 auto; display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:12px; }
+  .footer-brand { font-size:12px; font-weight:700; color:var(--ink-faint); }
+  .footer-contact { display:flex; align-items:center; gap:8px; font-size:12.5px; font-weight:600; color:var(--ink-soft); }
+  .footer-contact a { color:var(--ink-soft); text-decoration:none; }
+  .footer-contact a:hover { color:var(--pink); }
+  .footer-dot { color:var(--line); }
+  @media(max-width:560px){ .site-footer{padding:24px 24px;} .footer-inner{flex-direction:column; align-items:flex-start;} }
+
+  @media(max-width:560px){ .field-row{grid-template-columns:1fr} .hero{padding:56px 24px 40px} .container{padding:0 24px 80px} .topbar{padding:18px 22px} }
+</style>
+</head>
+<body>
+
+<nav class="topbar">
+  <button class="btn-nav btn-nav-ghost" type="button" onclick="openAuth('login')">Iniciar sesión</button>
+  <button class="btn-nav btn-nav-solid" type="button" onclick="openAuth('register')">Registrarse</button>
+</nav>
+
+<div class="hero">
+  <img class="hero-logo" src="Logotipo-PasiónPorElCliente-Horizontal.jpg" alt="Pasión Por El Cliente">
+  <h1>Hola, ¿en qué te podemos ayudar?</h1>
+  <div class="hero-rule"></div>
+  <p>Patrocinios, propuestas publicitarias, vales prepagados y alianzas para las marcas de Grupo Kuale, en un solo lugar.</p>
+</div>
+
+<div class="container">
+
+  <!-- TABS -->
+  <div class="tabs-bar">
+    <button class="tab-btn active" id="tabbtn-1" onclick="showTab(1)">Patrocinios</button>
+    <button class="tab-btn" id="tabbtn-2" onclick="showTab(2)">Propuesta publicitaria</button>
+    <button class="tab-btn" id="tabbtn-3" onclick="showTab(3)">Vales prepagados</button>
+    <button class="tab-btn" id="tabbtn-4" onclick="showTab(4)">Alianzas</button>
+  </div>
+
+  <!-- ===================== TAB 1: PATROCINIOS ===================== -->
+  <div class="page active" id="page-1">
+    <button class="btn-ghost" type="button" onclick="openHistory('patrocinios')">Ver mis patrocinios →</button>
+    <form class="card" onsubmit="return handleSubmit(event,1)">
+      <div class="card-title">Solicitud de patrocinio</div>
+      <p class="card-desc">Completa este formulario para solicitar el patrocinio de una marca de Grupo Kuale para tu evento, causa o institución.</p>
+
+      <div class="field-row">
+        <div class="field-group">
+          <label class="field-label">Ciudad *</label>
+          <select class="field-input" required>
+            <option value="">Selecciona una ciudad</option>
+            <option>Tampico</option><option>Altamira</option><option>Ciudad Madero</option><option>Ciudad Victoria</option>
+          </select>
+        </div>
+        <div class="field-group">
+          <label class="field-label">Marca a la que se le solicita el patrocinio *</label>
+          <select class="field-input" required>
+            <option value="">Selecciona una marca</option>
+            <option>Carl's Jr.</option><option>Dairy Queen</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="field-group">
+        <label class="field-label">Nombre de la empresa/institución *</label>
+        <input class="field-input" type="text" required>
+      </div>
+      <div class="field-group">
+        <label class="field-label">Domicilio *</label>
+        <input class="field-input" type="text" required>
+      </div>
+
+      <div class="field-row">
+        <div class="field-group">
+          <label class="field-label">Nombre de contacto *</label>
+          <input class="field-input" type="text" required>
+        </div>
+        <div class="field-group">
+          <label class="field-label">Email de contacto *</label>
+          <input class="field-input" type="email" required>
+        </div>
+      </div>
+      <div class="field-group">
+        <label class="field-label">Teléfono de contacto *</label>
+        <input class="field-input" type="tel" required>
+      </div>
+
+      <div class="field-group">
+        <label class="field-label">Nombre del evento *</label>
+        <input class="field-input" type="text" required>
+      </div>
+      <div class="field-row">
+        <div class="field-group">
+          <label class="field-label">Fecha del evento *</label>
+          <input class="field-input" type="date" required>
+        </div>
+        <div class="field-group">
+          <label class="field-label">Lugar del evento *</label>
+          <input class="field-input" type="text" required>
+        </div>
+      </div>
+      <div class="field-group">
+        <label class="field-label">Sitio web/Redes sociales <span class="opt">(opcional)</span></label>
+        <input class="field-input" type="text">
+      </div>
+
+      <div class="field-group">
+        <label class="field-label">¿Cuál es tu solicitud? *</label>
+        <textarea class="field-input" required placeholder="Describe qué tipo de apoyo solicitas (producto, económico, presencia de marca, etc.)"></textarea>
+      </div>
+      <div class="field-group">
+        <label class="field-label">¿Cuál es tu oferta? *</label>
+        <textarea class="field-input" required placeholder="¿Qué recibe la marca a cambio? (visibilidad, menciones, espacio, alcance esperado, etc.)"></textarea>
+      </div>
+
+      <div class="field-row">
+        <div class="field-group">
+          <label class="field-label">Subir carta del evento/causa *</label>
+          <label class="file-field">
+            <span class="file-field-btn">Elegir archivo</span>
+            <span class="file-field-name" data-default="Ningún archivo seleccionado">Ningún archivo seleccionado</span>
+            <input type="file" required onchange="updateFileName(this)">
+          </label>
+        </div>
+        <div class="field-group">
+          <label class="field-label">Subir presentación *</label>
+          <label class="file-field">
+            <span class="file-field-btn">Elegir archivo</span>
+            <span class="file-field-name" data-default="Ningún archivo seleccionado">Ningún archivo seleccionado</span>
+            <input type="file" required onchange="updateFileName(this)">
+          </label>
+        </div>
+      </div>
+
+      <button class="btn-primary" type="submit">Enviar solicitud</button>
+      <div class="success-toast" id="toast-1"><span class="st-icon">✓</span> Solicitud de patrocinio enviada correctamente.</div>
+    </form>
+  </div>
+
+  <!-- ===================== TAB 2: PROPUESTA PUBLICITARIA ===================== -->
+  <div class="page" id="page-2">
+    <button class="btn-ghost" type="button" onclick="openHistory('publicidad')">Ver mis propuestas publicitarias →</button>
+    <form class="card" onsubmit="return handleSubmit(event,2)">
+      <div class="card-title">Propuesta publicitaria</div>
+      <p class="card-desc">Envíanos tu propuesta de publicidad o colaboración de medios para Carl's Jr. o Dairy Queen.</p>
+
+      <div class="field-group">
+        <label class="field-label">Nombre de la empresa *</label>
+        <input class="field-input" type="text" required>
+      </div>
+      <div class="field-row">
+        <div class="field-group">
+          <label class="field-label">Nombre de contacto *</label>
+          <input class="field-input" type="text" required>
+        </div>
+        <div class="field-group">
+          <label class="field-label">Email de contacto *</label>
+          <input class="field-input" type="email" required>
+        </div>
+      </div>
+      <div class="field-group">
+        <label class="field-label">Teléfono de contacto *</label>
+        <input class="field-input" type="tel" required>
+      </div>
+      <div class="field-group">
+        <label class="field-label">Comentarios *</label>
+        <textarea class="field-input" required placeholder="Comentarios adicionales"></textarea>
+      </div>
+      <div class="field-group">
+        <label class="field-label">Sitio web/Redes sociales *</label>
+        <input class="field-input" type="text" required>
+      </div>
+      <div class="field-group">
+        <label class="field-label">Subir propuestas *</label>
+        <label class="file-field">
+          <span class="file-field-btn">Elegir archivo</span>
+          <span class="file-field-name" data-default="Ningún archivo seleccionado">Ningún archivo seleccionado</span>
+          <input type="file" required onchange="updateFileName(this)">
+        </label>
+      </div>
+
+      <button class="btn-primary" type="submit">Enviar solicitud</button>
+      <div class="success-toast" id="toast-2"><span class="st-icon">✓</span> Propuesta publicitaria enviada correctamente.</div>
+    </form>
+  </div>
+
+  <!-- ===================== TAB 3: VALES PREPAGADOS ===================== -->
+  <div class="page" id="page-3">
+    <button class="btn-ghost" type="button" onclick="openHistory('vales')">Ver mis vales →</button>
+    <form class="card" onsubmit="return handleSubmit(event,3)">
+      <div class="card-title">Solicitud de vales prepagados</div>
+      <p class="card-desc">Solicita vales prepagados para tu empresa o institución. Compra mínima de 10 vales.</p>
+
+      <div class="field-row">
+        <div class="field-group">
+          <label class="field-label">Ciudad *</label>
+          <select class="field-input" required>
+            <option value="">Selecciona una ciudad</option>
+            <option>Tampico</option><option>Altamira</option><option>Ciudad Madero</option><option>Ciudad Victoria</option>
+          </select>
+        </div>
+        <div class="field-group">
+          <label class="field-label">Nombre de la empresa/Institución *</label>
+          <input class="field-input" type="text" required>
+        </div>
+      </div>
+
+      <div class="field-row">
+        <div class="field-group">
+          <label class="field-label">Marca interesada *</label>
+          <select class="field-input" required>
+            <option value="">Selecciona una marca</option>
+            <option>Carl's Jr.</option><option>Dairy Queen</option>
+          </select>
+        </div>
+        <div class="field-group">
+          <label class="field-label">Cantidad de vales a comprar (Mínimo 10) *</label>
+          <input class="field-input" type="number" min="10" id="cantidad-vales" oninput="updateTotal()" required>
+        </div>
+      </div>
+
+      <div class="field-group">
+        <label class="field-label">Monto por vale *</label>
+        <div class="monto-grid">
+          <div class="monto-chip" onclick="selectMonto(this,100)"><span class="amount">$100</span><span class="currency">MXN</span></div>
+          <div class="monto-chip" onclick="selectMonto(this,200)"><span class="amount">$200</span><span class="currency">MXN</span></div>
+          <div class="monto-chip" onclick="selectMonto(this,300)"><span class="amount">$300</span><span class="currency">MXN</span></div>
+          <div class="monto-chip" onclick="selectMonto(this,400)"><span class="amount">$400</span><span class="currency">MXN</span></div>
+          <div class="monto-chip" onclick="selectMonto(this,500)"><span class="amount">$500</span><span class="currency">MXN</span></div>
+          <div class="monto-chip" onclick="selectMonto(this,'custom')"><span class="amount">＋</span><span class="currency">Personalizado</span></div>
+        </div>
+        <div class="monto-custom-wrap" id="monto-custom-wrap">
+          <input class="field-input" type="number" min="1" id="monto-custom-input" placeholder="Escribe el monto que necesitas (MXN)" oninput="syncCustomMonto(this)">
+        </div>
+        <input type="hidden" id="monto-hidden">
+      </div>
+
+      <div class="total-box" id="total-estimado">
+        <span class="total-label">Total estimado</span>
+        <span class="total-amount" id="total-amount">$0 MXN</span>
+      </div>
+
+      <div class="field-row">
+        <div class="field-group">
+          <label class="field-label">Forma de pago *</label>
+          <select class="field-input" required>
+            <option value="">Selecciona</option>
+            <option>Transferencia</option><option>Tarjeta</option><option>Efectivo</option>
+          </select>
+        </div>
+        <div class="field-group">
+          <label class="field-label">Fecha en la que se requieren los vales *</label>
+          <input class="field-input" type="date" required>
+        </div>
+      </div>
+
+      <div class="field-row">
+        <div class="field-group">
+          <label class="field-label">Nombre de contacto *</label>
+          <input class="field-input" type="text" required>
+        </div>
+        <div class="field-group">
+          <label class="field-label">Email de contacto *</label>
+          <input class="field-input" type="email" required>
+        </div>
+      </div>
+      <div class="field-group">
+        <label class="field-label">Teléfono de contacto *</label>
+        <input class="field-input" type="tel" required>
+      </div>
+
+      <button class="btn-primary" type="submit">Enviar solicitud</button>
+      <div class="success-toast" id="toast-3"><span class="st-icon">✓</span> Solicitud de vales enviada correctamente.</div>
+    </form>
+  </div>
+
+  <!-- ===================== TAB 4: ALIANZAS ===================== -->
+  <div class="page" id="page-4">
+    <button class="btn-ghost" type="button" onclick="openHistory('alianzas')">Ver mis alianzas →</button>
+    <div class="notice">Esta pestaña es una propuesta de campos siguiendo el patrón de las otras tres — no había captura de referencia. Ajústala como la necesites antes de conectarla.</div>
+    <form class="card" onsubmit="return handleSubmit(event,4)">
+      <div class="card-title">Solicitud de alianza</div>
+      <p class="card-desc">Propón una alianza comercial, institucional o de co-marketing con Carl's Jr. o Dairy Queen.</p>
+
+      <div class="field-row">
+        <div class="field-group">
+          <label class="field-label">Ciudad *</label>
+          <select class="field-input" required>
+            <option value="">Selecciona una ciudad</option>
+            <option>Tampico</option><option>Altamira</option><option>Ciudad Madero</option><option>Ciudad Victoria</option>
+          </select>
+        </div>
+        <div class="field-group">
+          <label class="field-label">Marca con la que buscas la alianza *</label>
+          <select class="field-input" required>
+            <option value="">Selecciona una marca</option>
+            <option>Carl's Jr.</option><option>Dairy Queen</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="field-group">
+        <label class="field-label">Nombre de la empresa/institución *</label>
+        <input class="field-input" type="text" required>
+      </div>
+
+      <div class="field-group">
+        <label class="field-label">Tipo de alianza *</label>
+        <select class="field-input" required>
+          <option value="">Selecciona una opción</option>
+          <option>Co-marketing / campaña conjunta</option>
+          <option>Canje de productos o servicios</option>
+          <option>Alianza institucional / educativa</option>
+          <option>Alianza con influencer o medio</option>
+          <option>Otro</option>
+        </select>
+      </div>
+
+      <div class="field-row">
+        <div class="field-group">
+          <label class="field-label">Nombre de contacto *</label>
+          <input class="field-input" type="text" required>
+        </div>
+        <div class="field-group">
+          <label class="field-label">Email de contacto *</label>
+          <input class="field-input" type="email" required>
+        </div>
+      </div>
+      <div class="field-group">
+        <label class="field-label">Teléfono de contacto *</label>
+        <input class="field-input" type="tel" required>
+      </div>
+      <div class="field-group">
+        <label class="field-label">Sitio web/Redes sociales <span class="opt">(opcional)</span></label>
+        <input class="field-input" type="text">
+      </div>
+
+      <div class="field-group">
+        <label class="field-label">¿Cuál es tu propuesta de alianza? *</label>
+        <textarea class="field-input" required placeholder="Describe en qué consiste la alianza que propones"></textarea>
+      </div>
+      <div class="field-group">
+        <label class="field-label">¿Qué beneficios ofreces a la marca? *</label>
+        <textarea class="field-input" required placeholder="Alcance, base de clientes, visibilidad, recursos, etc."></textarea>
+      </div>
+
+      <div class="field-group">
+        <label class="field-label">Subir propuesta <span class="opt">(opcional)</span></label>
+        <label class="file-field">
+          <span class="file-field-btn">Elegir archivo</span>
+          <span class="file-field-name" data-default="Ningún archivo seleccionado">Ningún archivo seleccionado</span>
+          <input type="file" onchange="updateFileName(this)">
+        </label>
+      </div>
+
+      <button class="btn-primary" type="submit">Enviar solicitud</button>
+      <div class="success-toast" id="toast-4"><span class="st-icon">✓</span> Propuesta de alianza enviada correctamente.</div>
+    </form>
+  </div>
+
+</div>
+
+<footer class="site-footer">
+  <div class="footer-inner">
+    <span class="footer-brand">Pasión Por El Cliente — Grupo Kuale</span>
+    <div class="footer-contact">
+      <a href="mailto:pasionxelcliente@grupokuale.com.mx">pasionxelcliente@grupokuale.com.mx</a>
+      <span class="footer-dot">·</span>
+      <a href="tel:+528332762122">833 276 2122</a>
+    </div>
+  </div>
+</footer>
+
+<!-- ===================== AUTH MODAL ===================== -->
+<div class="modal-overlay" id="auth-overlay" onclick="if(event.target===this) closeAuth()">
+  <div class="modal-box">
+    <button class="modal-close" type="button" onclick="closeAuth()">✕</button>
+    <img class="modal-logo" src="Logotipo-PasiónPorElCliente-Horizontal.jpg" alt="Pasión Por El Cliente">
+
+    <div class="modal-tabs">
+      <button class="modal-tab active" id="authtab-login" onclick="switchAuth('login')">Iniciar sesión</button>
+      <button class="modal-tab" id="authtab-register" onclick="switchAuth('register')">Registrarse</button>
+    </div>
+
+    <form class="auth-form active" id="authform-login" onsubmit="return handleAuthSubmit(event,'login')">
+      <div class="modal-title">Bienvenido de nuevo</div>
+      <p class="modal-sub">Ingresa a tu cuenta para dar seguimiento a tus solicitudes.</p>
+      <div class="field-group">
+        <label class="field-label">Email *</label>
+        <input class="field-input" type="email" required placeholder="tu@empresa.com">
+      </div>
+      <div class="field-group">
+        <label class="field-label">Contraseña *</label>
+        <input class="field-input" type="password" required placeholder="••••••••">
+      </div>
+      <a class="auth-forgot" href="#" onclick="return false;">¿Olvidaste tu contraseña?</a>
+      <button class="btn-primary" type="submit">Iniciar sesión</button>
+    </form>
+
+    <form class="auth-form" id="authform-register" onsubmit="return handleAuthSubmit(event,'register')">
+      <div class="modal-title">Crea tu cuenta</div>
+      <p class="modal-sub">Regístrate para enviar y dar seguimiento a tus solicitudes.</p>
+      <div class="field-group">
+        <label class="field-label">Nombre completo *</label>
+        <input class="field-input" type="text" required>
+      </div>
+      <div class="field-group">
+        <label class="field-label">Empresa/Institución *</label>
+        <input class="field-input" type="text" required>
+      </div>
+      <div class="field-group">
+        <label class="field-label">Email *</label>
+        <input class="field-input" type="email" required placeholder="tu@empresa.com">
+      </div>
+      <div class="field-group">
+        <label class="field-label">Contraseña *</label>
+        <input class="field-input" type="password" required placeholder="Mínimo 8 caracteres">
+      </div>
+      <button class="btn-primary" type="submit">Crear cuenta</button>
+    </form>
+  </div>
+</div>
+
+<!-- ===================== HISTORY MODAL ===================== -->
+<div class="modal-overlay" id="history-overlay" onclick="if(event.target===this) closeHistory()">
+  <div class="modal-box">
+    <button class="modal-close" type="button" onclick="closeHistory()">✕</button>
+    <div class="history-icon">🗂️</div>
+    <div class="modal-title" id="history-title">Mi historial</div>
+    <p class="modal-sub">Aquí se mostrará automáticamente el historial guardado de tus solicitudes al iniciar sesión con tu cuenta.</p>
+    <div class="notice" style="text-align:left;">Por el momento este espacio es solo informativo. Cuando el portal esté conectado a tu cuenta, aquí aparecerán tus solicitudes registradas con su estatus (en revisión, aprobada, enviada, etc.).</div>
+    <button class="btn-primary" type="button" onclick="closeHistory(); openAuth('login');">Iniciar sesión para ver mi historial</button>
+  </div>
+</div>
+
+<script>
+/* ============================================================
+   NOTA PARA CONEXIÓN A BACKEND
+   Este borrador NO envía datos a ningún lado todavía.
+   Para conectarlo, seguir el mismo patrón que PXC Track:
+   - Google Forms: crear un Form por pestaña, tomar su FORM_ID
+     y los entry.XXXXXXX de cada campo, y hacer POST oculto.
+   - Odoo: si se aloja dentro de Odoo, lo más directo es usar
+     el Website Builder con "Formulario personalizado" apuntando
+     a un modelo (CRM o uno custom, ej. pxc.solicitud) — así cada
+     envío cae directo en un registro Odoo con kanban propio.
+   ============================================================ */
+
+const historyTitles = {
+  patrocinios: 'Mis patrocinios',
+  publicidad: 'Mis propuestas publicitarias',
+  vales: 'Mis vales prepagados',
+  alianzas: 'Mis alianzas'
+};
+
+function openHistory(type) {
+  document.getElementById('history-title').textContent = historyTitles[type] || 'Mi historial';
+  document.getElementById('history-overlay').classList.add('open');
+}
+
+function closeHistory() {
+  document.getElementById('history-overlay').classList.remove('open');
+}
+
+function openAuth(mode) {
+  document.getElementById('auth-overlay').classList.add('open');
+  switchAuth(mode || 'login');
+}
+
+function closeAuth() {
+  document.getElementById('auth-overlay').classList.remove('open');
+}
+
+function switchAuth(mode) {
+  document.querySelectorAll('.modal-tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.auth-form').forEach(f => f.classList.remove('active'));
+  document.getElementById('authtab-' + mode).classList.add('active');
+  document.getElementById('authform-' + mode).classList.add('active');
+}
+
+function handleAuthSubmit(evt, mode) {
+  evt.preventDefault();
+  // Aquí se conectaría al backend real (Odoo res.users / portal, o Google Forms).
+  alert(mode === 'login' ? 'Inicio de sesión (demo) — falta conectar al backend.' : 'Registro (demo) — falta conectar al backend.');
+  closeAuth();
+  return false;
+}
+
+document.addEventListener('keydown', e => { if (e.key === 'Escape') { closeAuth(); closeHistory(); } });
+
+function selectMonto(el, val) {
+  document.querySelectorAll('.monto-chip').forEach(c => c.classList.remove('selected'));
+  el.classList.add('selected');
+  const customWrap = document.getElementById('monto-custom-wrap');
+  const customInput = document.getElementById('monto-custom-input');
+  const hidden = document.getElementById('monto-hidden');
+  if (val === 'custom') {
+    customWrap.style.display = 'block';
+    customInput.required = true;
+    hidden.value = customInput.value || '';
+    customInput.focus();
+  } else {
+    customWrap.style.display = 'none';
+    customInput.required = false;
+    customInput.value = '';
+    hidden.value = val;
+  }
+  updateTotal();
+}
+
+function syncCustomMonto(input) {
+  document.getElementById('monto-hidden').value = input.value;
+  updateTotal();
+}
+
+function updateTotal() {
+  const cantidad = parseInt(document.getElementById('cantidad-vales').value) || 0;
+  const monto = parseFloat(document.getElementById('monto-hidden').value) || 0;
+  const box = document.getElementById('total-estimado');
+  if (cantidad > 0 && monto > 0) {
+    box.style.display = 'flex';
+    document.getElementById('total-amount').textContent = '$' + (cantidad * monto).toLocaleString('es-MX') + ' MXN';
+  } else {
+    box.style.display = 'none';
+  }
+}
+
+function showTab(n) {
+
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('page-' + n).classList.add('active');
+  document.getElementById('tabbtn-' + n).classList.add('active');
+  window.scrollTo({ top:0, behavior:'smooth' });
+}
+
+function updateFileName(input) {
+  const span = input.closest('.file-field').querySelector('.file-field-name');
+  span.textContent = input.files.length ? input.files[0].name : span.dataset.default;
+}
+
+function handleSubmit(evt, n) {
+  evt.preventDefault();
+  const form = evt.target;
+  if (n === 3) {
+    const monto = parseFloat(document.getElementById('monto-hidden').value) || 0;
+    if (monto <= 0) {
+      alert('Selecciona el monto del vale (o indica un monto personalizado).');
+      return false;
+    }
+  }
+  const toast = document.getElementById('toast-' + n);
+  toast.style.display = 'flex';
+  toast.scrollIntoView({ behavior:'smooth', block:'nearest' });
+  setTimeout(() => {
+    form.reset();
+    document.querySelectorAll('#page-' + n + ' .file-field-name').forEach(s => s.textContent = s.dataset.default);
+    if (n === 3) {
+      document.querySelectorAll('.monto-chip').forEach(c => c.classList.remove('selected'));
+      document.getElementById('monto-custom-wrap').style.display = 'none';
+      document.getElementById('monto-hidden').value = '';
+      document.getElementById('total-estimado').style.display = 'none';
+    }
+  }, 400);
+  return false;
+}
+</script>
+</body>
+</html>
