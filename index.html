@@ -34,12 +34,15 @@
   .hero p { font-size:15.5px; color:var(--ink-soft); line-height:1.65; max-width:480px; margin:0 auto; font-weight:500; }
   @media(max-width:560px){ .hero-logo{height:80px;margin-bottom:26px} }
 
-  .brands-strip { margin-top:44px; }
-  .brands-label { display:block; font-size:10.5px; font-weight:700; letter-spacing:1.6px; text-transform:uppercase; color:var(--ink-faint); margin-bottom:16px; }
-  .brands-row { display:flex; align-items:center; justify-content:center; gap:14px; flex-wrap:wrap; }
-  .brand-logo-slot { width:130px; height:58px; border:1.5px dashed var(--line); border-radius:10px; display:flex; align-items:center; justify-content:center; background:var(--paper-soft); padding:8px; }
+  .brands-strip { margin-top:44px; width:100%; }
+  .brands-label { display:block; font-size:10.5px; font-weight:700; letter-spacing:1.6px; text-transform:uppercase; color:var(--ink-faint); margin-bottom:18px; }
+  .brands-marquee { overflow:hidden; width:100%; -webkit-mask-image:linear-gradient(90deg,transparent,black 12%,black 88%,transparent); mask-image:linear-gradient(90deg,transparent,black 12%,black 88%,transparent); }
+  .brands-track { display:flex; align-items:center; gap:14px; width:max-content; animation:brandsMarquee 26s linear infinite; }
+  .brands-track:hover { animation-play-state:paused; }
+  @keyframes brandsMarquee { from{transform:translateX(0);} to{transform:translateX(-50%);} }
+  .brand-logo-slot { flex-shrink:0; width:130px; height:58px; border:1.5px dashed var(--line); border-radius:10px; display:flex; align-items:center; justify-content:center; background:var(--paper-soft); padding:8px; }
   .brand-logo-slot img { max-height:34px; max-width:90%; object-fit:contain; }
-  .brand-logo-slot .brand-fallback { display:none; font-size:12.5px; font-weight:700; color:var(--ink-faint); }
+  .brand-logo-slot .brand-fallback { display:none; font-size:11.5px; font-weight:700; color:var(--ink-faint); text-align:center; padding:0 6px; }
   .brand-logo-slot.missing .brand-fallback { display:block; }
 
   .container { max-width:720px; margin:0 auto; padding:0 32px 100px; }
@@ -187,15 +190,8 @@
 
   <div class="brands-strip">
     <span class="brands-label">Marcas participantes</span>
-    <div class="brands-row">
-      <div class="brand-logo-slot">
-        <img src="Logo-CarlsJr.png" alt="Carl's Jr." onerror="this.style.display='none'; this.parentElement.classList.add('missing');">
-        <span class="brand-fallback">Carl's Jr.</span>
-      </div>
-      <div class="brand-logo-slot">
-        <img src="Logo-DairyQueen.png" alt="Dairy Queen" onerror="this.style.display='none'; this.parentElement.classList.add('missing');">
-        <span class="brand-fallback">Dairy Queen</span>
-      </div>
+    <div class="brands-marquee">
+      <div class="brands-track" id="brands-track"></div>
     </div>
   </div>
 </div>
@@ -648,7 +644,7 @@
       <p class="modal-sub">Ingresa a tu cuenta para dar seguimiento a tus solicitudes.</p>
       <div class="field-group">
         <label class="field-label">Email *</label>
-        <input class="field-input" type="email" required placeholder="tu@empresa.com">
+        <input class="field-input" type="text" required placeholder="tu@empresa.com">
       </div>
       <div class="field-group">
         <label class="field-label">Contraseña *</label>
@@ -671,7 +667,7 @@
       </div>
       <div class="field-group">
         <label class="field-label">Email *</label>
-        <input class="field-input" type="email" required placeholder="tu@empresa.com">
+        <input class="field-input" type="text" required placeholder="tu@empresa.com">
       </div>
       <div class="field-group">
         <label class="field-label">Contraseña *</label>
@@ -706,6 +702,30 @@
      a un modelo (CRM o uno custom, ej. pxc.solicitud) — así cada
      envío cae directo en un registro Odoo con kanban propio.
    ============================================================ */
+
+/* ===== Carrusel de logos de marcas =====
+   Coloca los archivos de imagen junto a este HTML con estos
+   nombres exactos y aparecerán automáticamente en el carrusel.
+   Mientras no exista el archivo, se muestra el nombre como respaldo. */
+const brandLogos = [
+  { file: "Logo-CarlsJr.png", name: "Carl's Jr." },
+  { file: "Logo-DairyQueen.png", name: "Dairy Queen" },
+  { file: "secco.png", name: "Secco" },
+  { file: "sprocket_garage_logo.png", name: "Sprocket Garage" },
+  { file: "logotipo_hidrológica.png", name: "Hidrológica" }
+];
+
+function renderBrandLogos() {
+  const track = document.getElementById('brands-track');
+  const slot = b => `
+    <div class="brand-logo-slot">
+      <img src="${b.file}" alt="${b.name}" onerror="this.style.display='none'; this.parentElement.classList.add('missing');">
+      <span class="brand-fallback">${b.name}</span>
+    </div>`;
+  const html = brandLogos.map(slot).join('');
+  track.innerHTML = html + html; // se duplica para que el loop sea continuo
+}
+renderBrandLogos();
 
 const historyTitles = {
   patrocinios: 'Mis patrocinios',
