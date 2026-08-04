@@ -36,14 +36,15 @@
 
   .brands-strip { margin-top:44px; width:100%; }
   .brands-label { display:block; font-size:10.5px; font-weight:700; letter-spacing:1.6px; text-transform:uppercase; color:var(--ink-faint); margin-bottom:18px; }
-  .brands-marquee { overflow:hidden; width:100%; -webkit-mask-image:linear-gradient(90deg,transparent,black 12%,black 88%,transparent); mask-image:linear-gradient(90deg,transparent,black 12%,black 88%,transparent); }
-  .brands-track { display:flex; align-items:center; gap:14px; width:max-content; animation:brandsMarquee 26s linear infinite; }
-  .brands-track:hover { animation-play-state:paused; }
-  @keyframes brandsMarquee { from{transform:translateX(0);} to{transform:translateX(-50%);} }
-  .brand-logo-slot { flex-shrink:0; width:340px; height:160px; border:1.5px dashed var(--line); border-radius:10px; display:flex; align-items:center; justify-content:center; background:var(--paper-soft); padding:10px; }
+  .brands-carousel { position:relative; display:flex; align-items:center; gap:10px; }
+  .brands-marquee { flex:1; overflow:hidden; width:100%; -webkit-mask-image:linear-gradient(90deg,transparent,black 12%,black 88%,transparent); mask-image:linear-gradient(90deg,transparent,black 12%,black 88%,transparent); }
+  .brands-track { display:flex; align-items:center; gap:14px; width:max-content; will-change:transform; }
+  .brand-logo-slot { flex-shrink:0; width:340px; height:160px; display:flex; align-items:center; justify-content:center; background:var(--paper); padding:10px; }
   .brand-logo-slot img { max-height:100px; max-width:90%; object-fit:contain; }
   .brand-logo-slot .brand-fallback { display:none; font-size:11.5px; font-weight:700; color:var(--ink-faint); text-align:center; padding:0 6px; }
   .brand-logo-slot.missing .brand-fallback { display:block; }
+  .brands-arrow { flex-shrink:0; width:34px; height:34px; border-radius:50%; border:1.5px solid var(--line); background:var(--paper); color:var(--ink-soft); font-size:17px; line-height:1; cursor:pointer; display:flex; align-items:center; justify-content:center; transition:all 0.15s; z-index:2; }
+  .brands-arrow:hover { border-color:var(--pink); color:var(--pink); }
 
   .container { max-width:720px; margin:0 auto; padding:0 32px 100px; }
 
@@ -198,8 +199,12 @@
 
   <div class="brands-strip">
     <span class="brands-label">Marcas participantes</span>
-    <div class="brands-marquee">
-      <div class="brands-track" id="brands-track"></div>
+    <div class="brands-carousel">
+      <button class="brands-arrow" type="button" onclick="nudgeBrands(-1)" aria-label="Marca anterior">‹</button>
+      <div class="brands-marquee">
+        <div class="brands-track" id="brands-track"></div>
+      </div>
+      <button class="brands-arrow" type="button" onclick="nudgeBrands(1)" aria-label="Marca siguiente">›</button>
     </div>
   </div>
 </div>
@@ -734,6 +739,33 @@ function renderBrandLogos() {
   track.innerHTML = html + html; // se duplica para que el loop sea continuo
 }
 renderBrandLogos();
+
+/* Carrusel de marcas: avance continuo por JS (nunca se detiene con el cursor).
+   Las flechas solo empujan la posición hacia adelante o atrás; el auto-scroll sigue. */
+let brandsOffset = 0;
+let brandsSpeed = 0.5; // px por frame
+
+function brandsLoop() {
+  const track = document.getElementById('brands-track');
+  if (track) {
+    const halfWidth = track.scrollWidth / 2;
+    brandsOffset -= brandsSpeed;
+    if (brandsOffset <= -halfWidth) brandsOffset += halfWidth;
+    if (brandsOffset > 0) brandsOffset -= halfWidth;
+    track.style.transform = `translateX(${brandsOffset}px)`;
+  }
+  requestAnimationFrame(brandsLoop);
+}
+requestAnimationFrame(brandsLoop);
+
+function nudgeBrands(dir) {
+  const track = document.getElementById('brands-track');
+  if (!track) return;
+  const halfWidth = track.scrollWidth / 2;
+  brandsOffset += dir * 180; // salto aproximado de un logo
+  if (brandsOffset <= -halfWidth) brandsOffset += halfWidth;
+  if (brandsOffset > 0) brandsOffset -= halfWidth;
+}
 
 const historyTitles = {
   patrocinios: 'Mis patrocinios',
