@@ -24,6 +24,7 @@
   .btn-nav-ghost:hover { border-color:var(--ink); }
   .btn-nav-solid { background:var(--ink); border:1.5px solid var(--ink); color:white; }
   .btn-nav-solid:hover { background:var(--pink); border-color:var(--pink); }
+  .topbar-user-name { font-size:13px; font-weight:700; color:var(--ink-soft); display:flex; align-items:center; padding:0 4px; }
 
   /* ===== Hero ===== */
   .hero { max-width:720px; margin:0 auto; padding:72px 32px 56px; text-align:center; }
@@ -32,6 +33,14 @@
   .hero-rule { width:46px; height:3px; background:var(--pink); border-radius:3px; margin:26px auto; }
   .hero p { font-size:15.5px; color:var(--ink-soft); line-height:1.65; max-width:480px; margin:0 auto; font-weight:500; }
   @media(max-width:560px){ .hero-logo{height:80px;margin-bottom:26px} }
+
+  .brands-strip { margin-top:44px; }
+  .brands-label { display:block; font-size:10.5px; font-weight:700; letter-spacing:1.6px; text-transform:uppercase; color:var(--ink-faint); margin-bottom:16px; }
+  .brands-row { display:flex; align-items:center; justify-content:center; gap:14px; flex-wrap:wrap; }
+  .brand-logo-slot { width:130px; height:58px; border:1.5px dashed var(--line); border-radius:10px; display:flex; align-items:center; justify-content:center; background:var(--paper-soft); padding:8px; }
+  .brand-logo-slot img { max-height:34px; max-width:90%; object-fit:contain; }
+  .brand-logo-slot .brand-fallback { display:none; font-size:12.5px; font-weight:700; color:var(--ink-faint); }
+  .brand-logo-slot.missing .brand-fallback { display:block; }
 
   .container { max-width:720px; margin:0 auto; padding:0 32px 100px; }
 
@@ -93,6 +102,13 @@
   .total-box .total-amount { font-size:19px; font-weight:800; color:white; }
   @media(max-width:420px){ .monto-grid{grid-template-columns:repeat(2,1fr)} }
 
+  .pago-hint { font-size:12.5px; color:var(--ink-faint); font-weight:600; text-align:center; padding:6px 0 4px; }
+  .ecommerce-card { border:1.5px solid var(--line); border-radius:14px; padding:32px 26px; text-align:center; background:var(--paper-soft); }
+  .ecommerce-card-icon { width:48px; height:48px; border-radius:50%; background:var(--pink-soft); display:flex; align-items:center; justify-content:center; font-size:22px; margin:0 auto 16px; }
+  .ecommerce-card-title { font-weight:800; font-size:17px; margin-bottom:8px; }
+  .ecommerce-card-text { font-size:13.5px; color:var(--ink-soft); line-height:1.6; margin-bottom:20px; font-weight:500; }
+  .ecommerce-card-note { font-size:11px; color:var(--ink-faint); margin-top:14px; font-weight:600; line-height:1.5; }
+
   /* ===== Auth modal ===== */
   .modal-overlay { display:none; position:fixed; inset:0; background:rgba(10,10,10,0.55); backdrop-filter:blur(2px); z-index:200; align-items:center; justify-content:center; padding:20px; }
   .modal-overlay.open { display:flex; }
@@ -125,14 +141,42 @@
   .footer-dot { color:var(--line); }
   @media(max-width:560px){ .site-footer{padding:24px 24px;} .footer-inner{flex-direction:column; align-items:flex-start;} }
 
+  /* ===== Dashboard (dummy) ===== */
+  .dash-container { max-width:720px; margin:0 auto; padding:56px 32px 70px; }
+  .dash-header { display:flex; align-items:flex-end; justify-content:space-between; gap:20px; flex-wrap:wrap; margin-bottom:30px; }
+  .dash-title { font-weight:800; font-size:26px; letter-spacing:-0.01em; margin-bottom:6px; }
+  .dash-sub { font-size:13.5px; color:var(--ink-soft); font-weight:500; max-width:420px; line-height:1.5; }
+
+  .dash-list { display:flex; flex-direction:column; gap:10px; }
+  .dash-item { display:flex; align-items:center; justify-content:space-between; gap:14px; flex-wrap:wrap; border:1.5px solid var(--line); border-radius:12px; padding:16px 18px; background:var(--paper); }
+  .dash-item-left { display:flex; align-items:center; gap:14px; }
+  .dash-tag { flex-shrink:0; font-size:10px; font-weight:800; text-transform:uppercase; letter-spacing:0.5px; color:var(--ink-faint); border:1px solid var(--line); border-radius:6px; padding:5px 9px; }
+  .dash-item-title { font-size:14px; font-weight:700; color:var(--ink); }
+  .dash-item-meta { font-size:12px; color:var(--ink-faint); font-weight:600; margin-top:2px; }
+
+  .status-badge { display:inline-flex; align-items:center; font-size:10.5px; font-weight:800; padding:6px 13px; border-radius:50px; text-transform:uppercase; letter-spacing:0.4px; white-space:nowrap; }
+  .status-recibida { background:var(--paper-soft); border:1px solid var(--line); color:var(--ink-soft); }
+  .status-revision { background:var(--pink-soft); border:1px solid var(--pink); color:var(--pink); }
+  .status-aprobada { background:var(--ink); color:white; }
+  .status-entregada { background:var(--pink); color:white; }
+  .status-rechazada { background:var(--paper-soft); border:1px solid var(--line); color:var(--ink-faint); }
+  @media(max-width:560px){ .dash-container{padding:40px 24px 56px;} .dash-item{padding:14px 16px;} }
+
   @media(max-width:560px){ .field-row{grid-template-columns:1fr} .hero{padding:56px 24px 40px} .container{padding:0 24px 80px} .topbar{padding:18px 22px} }
 </style>
 </head>
 <body>
 
 <nav class="topbar">
-  <button class="btn-nav btn-nav-ghost" type="button" onclick="openAuth('login')">Iniciar sesión</button>
-  <button class="btn-nav btn-nav-solid" type="button" onclick="openAuth('register')">Registrarse</button>
+  <div id="topbar-auth-buttons" style="display:flex; gap:10px;">
+    <button class="btn-nav btn-nav-ghost" type="button" onclick="openAuth('login')">Iniciar sesión</button>
+    <button class="btn-nav btn-nav-solid" type="button" onclick="openAuth('register')">Registrarse</button>
+  </div>
+  <div id="topbar-user-buttons" style="display:none; gap:10px;">
+    <span class="topbar-user-name" id="topbar-user-name">Hola, Axel</span>
+    <button class="btn-nav btn-nav-ghost" type="button" onclick="showDashboard()">Mi panel</button>
+    <button class="btn-nav btn-nav-ghost" type="button" onclick="logout()">Cerrar sesión</button>
+  </div>
 </nav>
 
 <div class="hero">
@@ -140,6 +184,20 @@
   <h1>Hola, ¿en qué te podemos ayudar?</h1>
   <div class="hero-rule"></div>
   <p>Patrocinios, propuestas publicitarias, vales prepagados y alianzas para las marcas de Grupo Kuale, en un solo lugar.</p>
+
+  <div class="brands-strip">
+    <span class="brands-label">Marcas participantes</span>
+    <div class="brands-row">
+      <div class="brand-logo-slot">
+        <img src="Logo-CarlsJr.png" alt="Carl's Jr." onerror="this.style.display='none'; this.parentElement.classList.add('missing');">
+        <span class="brand-fallback">Carl's Jr.</span>
+      </div>
+      <div class="brand-logo-slot">
+        <img src="Logo-DairyQueen.png" alt="Dairy Queen" onerror="this.style.display='none'; this.parentElement.classList.add('missing');">
+        <span class="brand-fallback">Dairy Queen</span>
+      </div>
+    </div>
+  </div>
 </div>
 
 <div class="container">
@@ -256,7 +314,7 @@
   <div class="page" id="page-2">
     <button class="btn-ghost" type="button" onclick="openHistory('publicidad')">Ver mis propuestas publicitarias →</button>
     <form class="card" onsubmit="return handleSubmit(event,2)">
-      <div class="card-title">Propuesta publicitaria</div>
+      <div class="card-title">Solicitud de propuesta publicitaria</div>
       <p class="card-desc">Envíanos tu propuesta de publicidad o colaboración de medios para Carl's Jr. o Dairy Queen.</p>
 
       <div class="field-group">
@@ -329,63 +387,76 @@
           </select>
         </div>
         <div class="field-group">
-          <label class="field-label">Cantidad de vales a comprar (Mínimo 10) *</label>
-          <input class="field-input" type="number" min="10" id="cantidad-vales" oninput="updateTotal()" required>
-        </div>
-      </div>
-
-      <div class="field-group">
-        <label class="field-label">Monto por vale *</label>
-        <div class="monto-grid">
-          <div class="monto-chip" onclick="selectMonto(this,100)"><span class="amount">$100</span><span class="currency">MXN</span></div>
-          <div class="monto-chip" onclick="selectMonto(this,200)"><span class="amount">$200</span><span class="currency">MXN</span></div>
-          <div class="monto-chip" onclick="selectMonto(this,300)"><span class="amount">$300</span><span class="currency">MXN</span></div>
-          <div class="monto-chip" onclick="selectMonto(this,400)"><span class="amount">$400</span><span class="currency">MXN</span></div>
-          <div class="monto-chip" onclick="selectMonto(this,500)"><span class="amount">$500</span><span class="currency">MXN</span></div>
-          <div class="monto-chip" onclick="selectMonto(this,'custom')"><span class="amount">＋</span><span class="currency">Personalizado</span></div>
-        </div>
-        <div class="monto-custom-wrap" id="monto-custom-wrap">
-          <input class="field-input" type="number" min="1" id="monto-custom-input" placeholder="Escribe el monto que necesitas (MXN)" oninput="syncCustomMonto(this)">
-        </div>
-        <input type="hidden" id="monto-hidden">
-      </div>
-
-      <div class="total-box" id="total-estimado">
-        <span class="total-label">Total estimado</span>
-        <span class="total-amount" id="total-amount">$0 MXN</span>
-      </div>
-
-      <div class="field-row">
-        <div class="field-group">
           <label class="field-label">Forma de pago *</label>
-          <select class="field-input" required>
+          <select class="field-input" id="forma-pago-vales" onchange="togglePagoVales(this.value)" required>
             <option value="">Selecciona</option>
-            <option>Transferencia</option><option>Tarjeta</option><option>Efectivo</option>
+            <option>Cheque</option><option>Transferencia</option><option>Pago en línea</option>
           </select>
         </div>
+      </div>
+
+      <p class="pago-hint" id="pago-hint">Elige la forma de pago para continuar.</p>
+
+      <!-- FLUJO ECOMMERCE: transferencia / pago en línea -->
+      <div class="ecommerce-card" id="vales-ecommerce-flow" style="display:none">
+        <div class="ecommerce-card-icon">🛒</div>
+        <div class="ecommerce-card-title">Compra en línea</div>
+        <p class="ecommerce-card-text">Este método de pago se procesa directamente en nuestra tienda en línea, donde eliges el monto, la cantidad y pagas de forma segura con transferencia o tarjeta.</p>
+        <a class="btn-primary" style="display:inline-block; text-decoration:none;" href="https://puntokuale.mx/shop/vales-prepagados" target="_blank" rel="noopener">Ir a la tienda en línea →</a>
+        <p class="ecommerce-card-note">*Dirección de referencia — ajustar cuando esté publicada la categoría "Vales prepagados" en el sitio eCommerce de Odoo.</p>
+      </div>
+
+      <!-- FLUJO MANUAL: cheque -->
+      <div id="vales-manual-flow" style="display:none">
+        <div class="field-group">
+          <label class="field-label">Cantidad de vales a comprar (Mínimo 10) *</label>
+          <input class="field-input" type="number" min="10" id="cantidad-vales" oninput="updateTotal()">
+        </div>
+
+        <div class="field-group">
+          <label class="field-label">Monto por vale *</label>
+          <div class="monto-grid">
+            <div class="monto-chip" onclick="selectMonto(this,100)"><span class="amount">$100</span><span class="currency">MXN</span></div>
+            <div class="monto-chip" onclick="selectMonto(this,200)"><span class="amount">$200</span><span class="currency">MXN</span></div>
+            <div class="monto-chip" onclick="selectMonto(this,300)"><span class="amount">$300</span><span class="currency">MXN</span></div>
+            <div class="monto-chip" onclick="selectMonto(this,400)"><span class="amount">$400</span><span class="currency">MXN</span></div>
+            <div class="monto-chip" onclick="selectMonto(this,500)"><span class="amount">$500</span><span class="currency">MXN</span></div>
+            <div class="monto-chip" onclick="selectMonto(this,'custom')"><span class="amount">＋</span><span class="currency">Personalizado</span></div>
+          </div>
+          <div class="monto-custom-wrap" id="monto-custom-wrap">
+            <input class="field-input" type="number" min="1" id="monto-custom-input" placeholder="Escribe el monto que necesitas (MXN)" oninput="syncCustomMonto(this)">
+          </div>
+          <input type="hidden" id="monto-hidden">
+        </div>
+
+        <div class="total-box" id="total-estimado">
+          <span class="total-label">Total estimado</span>
+          <span class="total-amount" id="total-amount">$0 MXN</span>
+        </div>
+
         <div class="field-group">
           <label class="field-label">Fecha en la que se requieren los vales *</label>
-          <input class="field-input" type="date" required>
+          <input class="field-input" type="date" id="fecha-vales">
         </div>
-      </div>
 
-      <div class="field-row">
-        <div class="field-group">
-          <label class="field-label">Nombre de contacto *</label>
-          <input class="field-input" type="text" required>
+        <div class="field-row">
+          <div class="field-group">
+            <label class="field-label">Nombre de contacto *</label>
+            <input class="field-input" type="text" id="contacto-vales">
+          </div>
+          <div class="field-group">
+            <label class="field-label">Email de contacto *</label>
+            <input class="field-input" type="email" id="email-vales">
+          </div>
         </div>
         <div class="field-group">
-          <label class="field-label">Email de contacto *</label>
-          <input class="field-input" type="email" required>
+          <label class="field-label">Teléfono de contacto *</label>
+          <input class="field-input" type="tel" id="telefono-vales">
         </div>
-      </div>
-      <div class="field-group">
-        <label class="field-label">Teléfono de contacto *</label>
-        <input class="field-input" type="tel" required>
-      </div>
 
-      <button class="btn-primary" type="submit">Enviar solicitud</button>
-      <div class="success-toast" id="toast-3"><span class="st-icon">✓</span> Solicitud de vales enviada correctamente.</div>
+        <button class="btn-primary" type="submit">Enviar solicitud</button>
+        <div class="success-toast" id="toast-3"><span class="st-icon">✓</span> Solicitud de vales enviada correctamente. Te contactaremos para confirmar la entrega y el pago con cheque.</div>
+      </div>
     </form>
   </div>
 
@@ -473,6 +544,81 @@
     </form>
   </div>
 
+</div>
+
+<!-- ===================== DASHBOARD (vista dummy al iniciar sesión) ===================== -->
+<div id="dashboard-view" style="display:none;">
+  <div class="dash-container">
+    <div class="dash-header">
+      <div>
+        <span class="eyebrow" style="display:block; text-align:left; margin-bottom:8px;">Mi cuenta</span>
+        <h2 class="dash-title">Hola, Axel 👋</h2>
+        <p class="dash-sub">Este es un adelanto (dummy) de tu panel — aquí darás seguimiento al estatus de cada solicitud que envíes.</p>
+      </div>
+      <button class="btn-ghost" type="button" style="margin:0;" onclick="showPortal()">＋ Nueva solicitud</button>
+    </div>
+
+    <div class="notice" style="text-align:left; margin-bottom:28px;">
+      Vista de demostración con datos de ejemplo. Cuando el portal esté conectado a Odoo, esta lista se llenará automáticamente con tus solicitudes reales y su estatus se irá actualizando conforme el equipo de Pasión Por El Cliente las evalúe — igual que el seguimiento que ya usamos en Reclutamiento.
+    </div>
+
+    <div class="dash-list">
+      <div class="dash-item">
+        <div class="dash-item-left">
+          <span class="dash-tag">Patrocinio</span>
+          <div>
+            <div class="dash-item-title">Torneo Regional de Voleibol 2026</div>
+            <div class="dash-item-meta">Carl's Jr. · Folio PXC-PAT-0148 · Enviada 12 jul 2026</div>
+          </div>
+        </div>
+        <span class="status-badge status-revision">En revisión</span>
+      </div>
+
+      <div class="dash-item">
+        <div class="dash-item-left">
+          <span class="dash-tag">Publicidad</span>
+          <div>
+            <div class="dash-item-title">Spot de radio — campaña de verano</div>
+            <div class="dash-item-meta">Dairy Queen · Folio PXC-PUB-0091 · Enviada 02 jul 2026</div>
+          </div>
+        </div>
+        <span class="status-badge status-aprobada">Aprobada</span>
+      </div>
+
+      <div class="dash-item">
+        <div class="dash-item-left">
+          <span class="dash-tag">Vales</span>
+          <div>
+            <div class="dash-item-title">50 vales × $200 MXN</div>
+            <div class="dash-item-meta">Carl's Jr. · Folio PXC-VAL-0212 · Enviada 28 jun 2026</div>
+          </div>
+        </div>
+        <span class="status-badge status-entregada">Vales entregados</span>
+      </div>
+
+      <div class="dash-item">
+        <div class="dash-item-left">
+          <span class="dash-tag">Alianza</span>
+          <div>
+            <div class="dash-item-title">Alianza con universidad local</div>
+            <div class="dash-item-meta">Dairy Queen · Folio PXC-ALZ-0034 · Enviada 15 jun 2026</div>
+          </div>
+        </div>
+        <span class="status-badge status-recibida">Recibida</span>
+      </div>
+
+      <div class="dash-item">
+        <div class="dash-item-left">
+          <span class="dash-tag">Patrocinio</span>
+          <div>
+            <div class="dash-item-title">Carrera 5K Altamira</div>
+            <div class="dash-item-meta">Carl's Jr. · Folio PXC-PAT-0102 · Enviada 30 may 2026</div>
+          </div>
+        </div>
+        <span class="status-badge status-rechazada">No aprobada</span>
+      </div>
+    </div>
+  </div>
 </div>
 
 <footer class="site-footer">
@@ -593,15 +739,63 @@ function switchAuth(mode) {
   document.getElementById('authform-' + mode).classList.add('active');
 }
 
+let isLoggedIn = false;
+
 function handleAuthSubmit(evt, mode) {
   evt.preventDefault();
-  // Aquí se conectaría al backend real (Odoo res.users / portal, o Google Forms).
-  alert(mode === 'login' ? 'Inicio de sesión (demo) — falta conectar al backend.' : 'Registro (demo) — falta conectar al backend.');
+  // Aquí se conectaría al backend real (Odoo res.users / portal de clientes).
   closeAuth();
+  isLoggedIn = true;
+  updateTopbarAuthState();
+  showDashboard();
   return false;
 }
 
+function updateTopbarAuthState() {
+  document.getElementById('topbar-auth-buttons').style.display = isLoggedIn ? 'none' : 'flex';
+  document.getElementById('topbar-user-buttons').style.display = isLoggedIn ? 'flex' : 'none';
+}
+
+function showDashboard() {
+  document.querySelector('.hero').style.display = 'none';
+  document.querySelector('.container').style.display = 'none';
+  document.getElementById('dashboard-view').style.display = 'block';
+  window.scrollTo({ top:0, behavior:'smooth' });
+}
+
+function showPortal() {
+  document.querySelector('.hero').style.display = '';
+  document.querySelector('.container').style.display = '';
+  document.getElementById('dashboard-view').style.display = 'none';
+  window.scrollTo({ top:0, behavior:'smooth' });
+}
+
+function logout() {
+  isLoggedIn = false;
+  updateTopbarAuthState();
+  showPortal();
+}
+
 document.addEventListener('keydown', e => { if (e.key === 'Escape') { closeAuth(); closeHistory(); } });
+
+function togglePagoVales(val) {
+  const manual = document.getElementById('vales-manual-flow');
+  const ecommerce = document.getElementById('vales-ecommerce-flow');
+  const hint = document.getElementById('pago-hint');
+  if (val === 'Cheque') {
+    manual.style.display = 'block';
+    ecommerce.style.display = 'none';
+    hint.style.display = 'none';
+  } else if (val === 'Transferencia' || val === 'Pago en línea') {
+    manual.style.display = 'none';
+    ecommerce.style.display = 'block';
+    hint.style.display = 'none';
+  } else {
+    manual.style.display = 'none';
+    ecommerce.style.display = 'none';
+    hint.style.display = 'block';
+  }
+}
 
 function selectMonto(el, val) {
   document.querySelectorAll('.monto-chip').forEach(c => c.classList.remove('selected'));
@@ -663,6 +857,11 @@ function handleSubmit(evt, n) {
       alert('Selecciona el monto del vale (o indica un monto personalizado).');
       return false;
     }
+    const requiredIds = ['cantidad-vales','fecha-vales','contacto-vales','email-vales','telefono-vales'];
+    for (const id of requiredIds) {
+      const el = document.getElementById(id);
+      if (!el.value) { el.focus(); alert('Completa todos los campos obligatorios antes de enviar.'); return false; }
+    }
   }
   const toast = document.getElementById('toast-' + n);
   toast.style.display = 'flex';
@@ -675,6 +874,7 @@ function handleSubmit(evt, n) {
       document.getElementById('monto-custom-wrap').style.display = 'none';
       document.getElementById('monto-hidden').value = '';
       document.getElementById('total-estimado').style.display = 'none';
+      togglePagoVales('');
     }
   }, 400);
   return false;
