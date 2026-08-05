@@ -740,18 +740,23 @@ function renderBrandLogos() {
 }
 renderBrandLogos();
 
-/* Carrusel de marcas: avance continuo por JS (nunca se detiene con el cursor).
-   Las flechas solo empujan la posición hacia adelante o atrás; el auto-scroll sigue. */
+/* Carrusel de marcas: auto-scroll continuo + navegación suave con flechas. */
 let brandsOffset = 0;
-let brandsSpeed = 0.5; // px por frame
+let brandsSpeed = 0.5;
+let brandsAnimating = false;
+const BRANDS_SLOT_W = 354; // 340px logo + 14px gap
+const BRANDS_NUDGE_MS = 400;
+
+function brandsEase(t) { return t < .5 ? 2*t*t : -1+(4-2*t)*t; }
 
 function brandsLoop() {
   const track = document.getElementById('brands-track');
   if (track) {
-    const halfWidth = track.scrollWidth / 2;
-    brandsOffset -= brandsSpeed;
-    if (brandsOffset <= -halfWidth) brandsOffset += halfWidth;
-    if (brandsOffset > 0) brandsOffset -= halfWidth;
+    if (!brandsAnimating) {
+      const halfWidth = track.scrollWidth / 2;
+      brandsOffset -= brandsSpeed;
+      if (brandsOffset <= -halfWidth) brandsOffset += halfWidth;
+    }
     track.style.transform = `translateX(${brandsOffset}px)`;
   }
   requestAnimationFrame(brandsLoop);
@@ -759,12 +764,23 @@ function brandsLoop() {
 requestAnimationFrame(brandsLoop);
 
 function nudgeBrands(dir) {
+  if (brandsAnimating) return;
   const track = document.getElementById('brands-track');
   if (!track) return;
   const halfWidth = track.scrollWidth / 2;
-  brandsOffset += dir * 180; // salto aproximado de un logo
-  if (brandsOffset <= -halfWidth) brandsOffset += halfWidth;
-  if (brandsOffset > 0) brandsOffset -= halfWidth;
+  const from = brandsOffset;
+  const delta = -dir * BRANDS_SLOT_W;
+  const start = performance.now();
+  brandsAnimating = true;
+  (function step(ts) {
+    const t = Math.min((ts - start) / BRANDS_NUDGE_MS, 1);
+    let pos = from + delta * brandsEase(t);
+    while (pos <= -halfWidth) pos += halfWidth;
+    while (pos > 0) pos -= halfWidth;
+    brandsOffset = pos;
+    if (t < 1) { requestAnimationFrame(step); }
+    else { brandsAnimating = false; }
+  })(start);
 }
 
 const historyTitles = {
