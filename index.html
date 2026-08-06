@@ -390,7 +390,7 @@
       <div class="field-row">
         <div class="field-group">
           <label class="field-label">Marca interesada *</label>
-          <select class="field-input" required>
+          <select class="field-input" id="marca-vales" onchange="updateValesEcommerceLink()" required>
             <option value="">Selecciona una marca</option>
             <option>Carl's Jr.</option><option>Dairy Queen</option>
           </select>
@@ -411,8 +411,8 @@
         <div class="ecommerce-card-icon">🛒</div>
         <div class="ecommerce-card-title">Compra en línea</div>
         <p class="ecommerce-card-text">Este método de pago se procesa directamente en nuestra tienda en línea, donde eliges el monto, la cantidad y pagas de forma segura con transferencia o tarjeta.</p>
-        <a class="btn-primary" style="display:inline-block; text-decoration:none;" href="https://puntokuale.mx/shop/vales-prepagados" target="_blank" rel="noopener">Ir a la tienda en línea →</a>
-        <p class="ecommerce-card-note">*Dirección de referencia — ajustar cuando esté publicada la categoría "Vales prepagados" en el sitio eCommerce de Odoo.</p>
+        <a class="btn-primary" id="vales-ecommerce-link" style="display:inline-block; text-decoration:none;" href="#" target="_blank" rel="noopener" onclick="return handleValesEcommerceClick(event)">Ir a la tienda en línea →</a>
+        <p class="ecommerce-card-note" id="vales-ecommerce-note">Serás dirigido a la página de compra del vale de la marca seleccionada.</p>
       </div>
 
       <!-- FLUJO MANUAL: cheque -->
@@ -854,6 +854,38 @@ function logout() {
 
 document.addEventListener('keydown', e => { if (e.key === 'Escape') { closeAuth(); closeHistory(); } });
 
+/* URL de compra en la tienda en línea, según la marca seleccionada. */
+const valesEcommerceUrls = {
+  "Dairy Queen": "http://3.138.85.58/shop/vale-dairy-queen-2189#attr=61",
+  "Carl's Jr.": "http://3.138.85.58/shop/vale-carl-s-jr-2188#attr=56"
+};
+
+function updateValesEcommerceLink() {
+  const marca = document.getElementById('marca-vales').value;
+  const link = document.getElementById('vales-ecommerce-link');
+  const note = document.getElementById('vales-ecommerce-note');
+  const url = valesEcommerceUrls[marca];
+  if (url) {
+    link.href = url;
+    link.classList.remove('btn-disabled');
+    note.textContent = 'Serás dirigido a la página de compra del vale de ' + marca + '.';
+  } else {
+    link.href = '#';
+    note.textContent = 'Selecciona una marca arriba para ir a su página de compra.';
+  }
+}
+
+function handleValesEcommerceClick(evt) {
+  const marca = document.getElementById('marca-vales').value;
+  if (!valesEcommerceUrls[marca]) {
+    evt.preventDefault();
+    document.getElementById('marca-vales').focus();
+    alert('Selecciona la marca interesada antes de continuar a la tienda en línea.');
+    return false;
+  }
+  return true;
+}
+
 function togglePagoVales(val) {
   const manual = document.getElementById('vales-manual-flow');
   const ecommerce = document.getElementById('vales-ecommerce-flow');
@@ -866,6 +898,7 @@ function togglePagoVales(val) {
     manual.style.display = 'none';
     ecommerce.style.display = 'block';
     hint.style.display = 'none';
+    updateValesEcommerceLink();
   } else {
     manual.style.display = 'none';
     ecommerce.style.display = 'none';
