@@ -56,10 +56,13 @@
   .board-title { font-weight:800; font-size:24px; letter-spacing:-0.01em; margin-bottom:6px; }
   .board-sub { font-size:13.5px; color:var(--ink-soft); font-weight:500; max-width:560px; line-height:1.5; }
 
-  .filter-row { display:flex; gap:8px; flex-wrap:wrap; margin:26px 0 26px; }
-  .filter-chip { background:var(--paper-soft); border:1.5px solid var(--line); border-radius:50px; padding:8px 16px; font-family:'Manrope',sans-serif; font-size:12.5px; font-weight:700; color:var(--ink-soft); cursor:pointer; transition:all .15s; }
+  .filter-block { margin:22px 0; }
+  .filter-block-label { display:block; font-size:10.5px; font-weight:800; text-transform:uppercase; letter-spacing:0.6px; color:var(--ink-faint); margin-bottom:10px; }
+  .filter-row { display:flex; gap:8px; flex-wrap:wrap; }
+  .filter-chip { background:var(--paper-soft); border:1.5px solid var(--line); border-radius:50px; padding:8px 16px; font-family:'Manrope',sans-serif; font-size:12.5px; font-weight:700; color:var(--ink-soft); cursor:pointer; transition:all .15s; display:inline-flex; align-items:center; }
   .filter-chip:hover { border-color:var(--pink); color:var(--ink); }
   .filter-chip.active { background:var(--ink); border-color:var(--ink); color:#fff; }
+  .brand-dot { display:inline-block; width:9px; height:9px; border-radius:50%; margin-right:7px; flex-shrink:0; }
 
   .kanban { display:flex; gap:12px; overflow-x:auto; padding-bottom:10px; align-items:flex-start; }
   .kanban-col { flex:1 1 0; min-width:200px; max-width:230px; display:flex; flex-direction:column; background:var(--paper-soft); border:1px solid var(--line); border-radius:14px; max-height:70vh; min-height:220px; }
@@ -158,12 +161,27 @@
     <div class="board-title">Tablero de seguimiento</div>
     <p class="board-sub">Da seguimiento a las solicitudes de patrocinios, publicidad, vales y alianzas. Arrastra una tarjeta para cambiar su status, o ábrela para agregar comentarios y tareas pendientes.</p>
 
-    <div class="filter-row" id="filter-row">
-      <button class="filter-chip active" data-filter="todos" onclick="setFilter('todos')">Todos <span id="count-todos"></span></button>
-      <button class="filter-chip" data-filter="patrocinios" onclick="setFilter('patrocinios')">Patrocinios <span id="count-patrocinios"></span></button>
-      <button class="filter-chip" data-filter="publicidad" onclick="setFilter('publicidad')">Publicidad <span id="count-publicidad"></span></button>
-      <button class="filter-chip" data-filter="vales" onclick="setFilter('vales')">Vales <span id="count-vales"></span></button>
-      <button class="filter-chip" data-filter="alianzas" onclick="setFilter('alianzas')">Alianzas <span id="count-alianzas"></span></button>
+    <div class="filter-block">
+      <span class="filter-block-label">Rubro</span>
+      <div class="filter-row" id="filter-row">
+        <button class="filter-chip active" data-filter="todos" onclick="setFilter('todos')">Todos <span id="count-todos"></span></button>
+        <button class="filter-chip" data-filter="patrocinios" onclick="setFilter('patrocinios')">Patrocinios <span id="count-patrocinios"></span></button>
+        <button class="filter-chip" data-filter="publicidad" onclick="setFilter('publicidad')">Publicidad <span id="count-publicidad"></span></button>
+        <button class="filter-chip" data-filter="vales" onclick="setFilter('vales')">Vales <span id="count-vales"></span></button>
+        <button class="filter-chip" data-filter="alianzas" onclick="setFilter('alianzas')">Alianzas <span id="count-alianzas"></span></button>
+      </div>
+    </div>
+
+    <div class="filter-block">
+      <span class="filter-block-label">Marca</span>
+      <div class="filter-row" id="brand-filter-row">
+        <button class="filter-chip active" data-brand="todos" onclick="setBrandFilter('todos')">Todas <span id="bcount-todos"></span></button>
+        <button class="filter-chip" data-brand="carls" onclick="setBrandFilter('carls')"><span class="brand-dot" style="background:#F5B301"></span>Carl's Jr. <span id="bcount-carls"></span></button>
+        <button class="filter-chip" data-brand="dq" onclick="setBrandFilter('dq')"><span class="brand-dot" style="background:#0072CE"></span>Dairy Queen <span id="bcount-dq"></span></button>
+        <button class="filter-chip" data-brand="secco" onclick="setBrandFilter('secco')"><span class="brand-dot" style="background:#F2600C"></span>Secco <span id="bcount-secco"></span></button>
+        <button class="filter-chip" data-brand="sprocket" onclick="setBrandFilter('sprocket')"><span class="brand-dot" style="background:#0a0a0a"></span>Sprocket Garage <span id="bcount-sprocket"></span></button>
+        <button class="filter-chip" data-brand="hidrologica" onclick="setBrandFilter('hidrologica')"><span class="brand-dot" style="background:#1FA463"></span>Hidrológica <span id="bcount-hidrologica"></span></button>
+      </div>
     </div>
 
     <div class="kanban" id="kanban"></div>
@@ -211,7 +229,7 @@
    comentarios/tareas (o mail.message / activity de Odoo).
    ============================================================ */
 
-const STORAGE_KEY = 'pxc_panel_interno_v1';
+const STORAGE_KEY = 'pxc_panel_interno_v2';
 
 const STATUSES = [
   { key:'recibida',  label:'Recibida',     barColor:'#c9c9c9' },
@@ -229,29 +247,41 @@ const RUBROS = {
   alianzas: 'Alianza'
 };
 
+const BRANDS = {
+  carls:       { label:"Carl's Jr.",      color:'#F5B301' },
+  dq:          { label:'Dairy Queen',     color:'#0072CE' },
+  secco:       { label:'Secco',           color:'#F2600C' },
+  sprocket:    { label:'Sprocket Garage', color:'#0a0a0a' },
+  hidrologica: { label:'Hidrológica',     color:'#1FA463' }
+};
+
 function seedRequests() {
   return [
-    { id:'r1', rubro:'patrocinios', title:'Torneo Regional de Voleibol 2026', brand:"Carl's Jr.", folio:'PXC-PAT-0148', date:'12 jul 2026', status:'revision',
+    { id:'r1', rubro:'patrocinios', brandKey:'carls', title:'Torneo Regional de Voleibol 2026', folio:'PXC-PAT-0148', date:'12 jul 2026', status:'revision',
       tasks:[ {text:'Confirmar presupuesto con la marca', done:false}, {text:'Responder al solicitante', done:false} ],
       comments:[ {author:'Demo', date:'12 jul 2026', text:'Solicitud recibida por correo, pendiente validar con el equipo de marca.'} ] },
-    { id:'r2', rubro:'publicidad', title:'Spot de radio — campaña de verano', brand:'Dairy Queen', folio:'PXC-PUB-0091', date:'02 jul 2026', status:'aprobada',
+    { id:'r2', rubro:'publicidad', brandKey:'dq', title:'Spot de radio — campaña de verano', folio:'PXC-PUB-0091', date:'02 jul 2026', status:'aprobada',
       tasks:[ {text:'Coordinar grabación del spot', done:true} ], comments:[] },
-    { id:'r3', rubro:'vales', title:'50 vales × $200 MXN', brand:"Carl's Jr.", folio:'PXC-VAL-0212', date:'28 jun 2026', status:'entregada',
+    { id:'r3', rubro:'vales', brandKey:'carls', title:'50 vales × $200 MXN', folio:'PXC-VAL-0212', date:'28 jun 2026', status:'entregada',
       tasks:[], comments:[ {author:'Demo', date:'29 jun 2026', text:'Vales entregados en oficina de Tampico.'} ] },
-    { id:'r4', rubro:'alianzas', title:'Alianza con universidad local', brand:'Dairy Queen', folio:'PXC-ALZ-0034', date:'15 jun 2026', status:'recibida',
+    { id:'r4', rubro:'alianzas', brandKey:'dq', title:'Alianza con universidad local', folio:'PXC-ALZ-0034', date:'15 jun 2026', status:'recibida',
       tasks:[ {text:'Agendar llamada con coordinación académica', done:false} ], comments:[] },
-    { id:'r5', rubro:'patrocinios', title:'Carrera 5K Altamira', brand:"Carl's Jr.", folio:'PXC-PAT-0102', date:'30 may 2026', status:'rechazada',
+    { id:'r5', rubro:'patrocinios', brandKey:'carls', title:'Carrera 5K Altamira', folio:'PXC-PAT-0102', date:'30 may 2026', status:'rechazada',
       tasks:[], comments:[ {author:'Demo', date:'31 may 2026', text:'No cumple con la política de patrocinios deportivos del trimestre.'} ] },
-    { id:'r6', rubro:'publicidad', title:'Colaboración con influencer local', brand:"Carl's Jr.", folio:'PXC-PUB-0102', date:'20 jul 2026', status:'recibida',
+    { id:'r6', rubro:'publicidad', brandKey:'secco', title:'Colaboración con influencer local', folio:'PXC-PUB-0102', date:'20 jul 2026', status:'recibida',
       tasks:[], comments:[] },
-    { id:'r7', rubro:'vales', title:'20 vales × $100 MXN', brand:'Dairy Queen', folio:'PXC-VAL-0233', date:'18 jul 2026', status:'revision',
+    { id:'r7', rubro:'vales', brandKey:'dq', title:'20 vales × $100 MXN', folio:'PXC-VAL-0233', date:'18 jul 2026', status:'revision',
       tasks:[ {text:'Validar forma de pago (transferencia)', done:false} ], comments:[] },
-    { id:'r8', rubro:'alianzas', title:'Co-marketing con gimnasio Fit Zone', brand:"Carl's Jr.", folio:'PXC-ALZ-0041', date:'22 jul 2026', status:'aprobada',
+    { id:'r8', rubro:'alianzas', brandKey:'sprocket', title:'Co-marketing con gimnasio Fit Zone', folio:'PXC-ALZ-0041', date:'22 jul 2026', status:'aprobada',
       tasks:[ {text:'Firmar convenio', done:false}, {text:'Definir fecha de lanzamiento', done:false} ], comments:[] },
-    { id:'r9', rubro:'patrocinios', title:'Festival Cultural Ciudad Victoria', brand:'Dairy Queen', folio:'PXC-PAT-0155', date:'25 jul 2026', status:'entregada',
+    { id:'r9', rubro:'patrocinios', brandKey:'hidrologica', title:'Festival Cultural Ciudad Victoria', folio:'PXC-PAT-0155', date:'25 jul 2026', status:'entregada',
       tasks:[], comments:[ {author:'Demo', date:'26 jul 2026', text:'Banners entregados, patrocinio confirmado para el evento.'} ] },
-    { id:'r10', rubro:'publicidad', title:'Espectacular en carretera Tampico-Altamira', brand:"Carl's Jr.", folio:'PXC-PUB-0110', date:'05 ago 2026', status:'revision',
-      tasks:[], comments:[] }
+    { id:'r10', rubro:'publicidad', brandKey:'secco', title:'Espectacular en carretera Tampico-Altamira', folio:'PXC-PUB-0110', date:'05 ago 2026', status:'revision',
+      tasks:[], comments:[] },
+    { id:'r11', rubro:'vales', brandKey:'sprocket', title:'30 vales × $150 MXN', folio:'PXC-VAL-0255', date:'01 ago 2026', status:'recibida',
+      tasks:[], comments:[] },
+    { id:'r12', rubro:'alianzas', brandKey:'hidrologica', title:'Alianza con centro deportivo acuático', folio:'PXC-ALZ-0052', date:'03 ago 2026', status:'aprobada',
+      tasks:[ {text:'Coordinar visita a instalaciones', done:false} ], comments:[] }
   ];
 }
 
@@ -271,6 +301,7 @@ function saveData() {
 
 let requests = loadRequests();
 let currentFilter = 'todos';
+let currentBrandFilter = 'todos';
 let openCardId = null;
 
 function escapeHtml(str) {
@@ -320,7 +351,13 @@ function showBoard() {
 /* ===== Filtros ===== */
 function setFilter(f) {
   currentFilter = f;
-  document.querySelectorAll('.filter-chip').forEach(c => c.classList.toggle('active', c.dataset.filter === f));
+  document.querySelectorAll('#filter-row .filter-chip').forEach(c => c.classList.toggle('active', c.dataset.filter === f));
+  renderBoard();
+}
+
+function setBrandFilter(b) {
+  currentBrandFilter = b;
+  document.querySelectorAll('#brand-filter-row .filter-chip').forEach(c => c.classList.toggle('active', c.dataset.brand === b));
   renderBoard();
 }
 
@@ -331,13 +368,24 @@ function updateFilterCounts() {
     const el = document.getElementById('count-' + k);
     if (el) el.textContent = '(' + counts[k] + ')';
   });
+
+  const brandCounts = { todos: requests.length };
+  Object.keys(BRANDS).forEach(k => { brandCounts[k] = 0; });
+  requests.forEach(r => { brandCounts[r.brandKey] = (brandCounts[r.brandKey] || 0) + 1; });
+  Object.keys(brandCounts).forEach(k => {
+    const el = document.getElementById('bcount-' + k);
+    if (el) el.textContent = '(' + brandCounts[k] + ')';
+  });
 }
 
 /* ===== Tablero ===== */
 function renderBoard() {
   updateFilterCounts();
   const kanban = document.getElementById('kanban');
-  const visible = requests.filter(r => currentFilter === 'todos' || r.rubro === currentFilter);
+  const visible = requests.filter(r =>
+    (currentFilter === 'todos' || r.rubro === currentFilter) &&
+    (currentBrandFilter === 'todos' || r.brandKey === currentBrandFilter)
+  );
 
   kanban.innerHTML = STATUSES.map(status => {
     const cards = visible.filter(r => r.status === status.key);
@@ -357,11 +405,12 @@ function renderBoard() {
 
 function cardHtml(r) {
   const done = r.tasks.filter(t => t.done).length;
+  const brand = BRANDS[r.brandKey];
   return `
-    <div class="kcard" draggable="true" data-id="${r.id}">
+    <div class="kcard" draggable="true" data-id="${r.id}" style="border-left:4px solid ${brand.color}">
       <span class="kcard-tag">${RUBROS[r.rubro]}</span>
       <div class="kcard-title">${escapeHtml(r.title)}</div>
-      <div class="kcard-meta">${escapeHtml(r.brand)} · Folio ${escapeHtml(r.folio)} · ${escapeHtml(r.date)}</div>
+      <div class="kcard-meta"><span class="brand-dot" style="background:${brand.color}"></span>${escapeHtml(brand.label)} · Folio ${escapeHtml(r.folio)} · ${escapeHtml(r.date)}</div>
       <div class="kcard-footer">
         <span>💬 ${r.comments.length}</span>
         <span>☑ ${done}/${r.tasks.length}</span>
@@ -447,12 +496,14 @@ function renderCardModal() {
   const r = currentRequest();
   if (!r) return;
 
+  const brand = BRANDS[r.brandKey];
   document.getElementById('cm-tag-row').innerHTML =
     `<span class="kcard-tag">${RUBROS[r.rubro]}</span>
      <span class="status-badge status-${r.status}">${STATUS_MAP[r.status].label}</span>`;
 
   document.getElementById('cm-title').textContent = r.title;
-  document.getElementById('cm-meta').textContent = `${r.brand} · Folio ${r.folio} · Enviada ${r.date}`;
+  document.getElementById('cm-meta').innerHTML =
+    `<span class="brand-dot" style="background:${brand.color}"></span>${escapeHtml(brand.label)} · Folio ${escapeHtml(r.folio)} · Enviada ${escapeHtml(r.date)}`;
 
   const select = document.getElementById('cm-status-select');
   select.innerHTML = STATUSES.map(s => `<option value="${s.key}" ${s.key === r.status ? 'selected' : ''}>${s.label}</option>`).join('');
