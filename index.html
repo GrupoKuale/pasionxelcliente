@@ -949,7 +949,6 @@ function showTab(n) {
   document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
   document.getElementById('page-' + n).classList.add('active');
   document.getElementById('tabbtn-' + n).classList.add('active');
-  window.scrollTo({ top:0, behavior:'smooth' });
 }
 
 function updateFileName(input) {
