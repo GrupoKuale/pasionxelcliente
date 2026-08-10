@@ -114,7 +114,7 @@
   .ecommerce-card-note { font-size:11px; color:var(--ink-faint); margin-top:14px; font-weight:600; line-height:1.5; }
 
   /* ===== Auth modal ===== */
-  .modal-overlay { display:none; position:fixed; inset:0; background:rgba(10,10,10,0.55); backdrop-filter:blur(2px); z-index:200; align-items:center; justify-content:center; padding:20px; }
+  .modal-overlay { display:none; position:fixed; inset:0; background:rgba(10,10,10,0.65); z-index:200; align-items:center; justify-content:center; padding:20px; }
   .modal-overlay.open { display:flex; }
   .modal-box { background:var(--paper); border-radius:16px; width:100%; max-width:400px; padding:36px 32px 32px; position:relative; animation:modalIn 0.22s ease both; box-shadow:0 20px 60px rgba(0,0,0,0.25); }
   @keyframes modalIn { from{opacity:0;transform:translateY(10px) scale(0.98)} to{opacity:1;transform:translateY(0) scale(1)} }
@@ -795,19 +795,23 @@ const historyTitles = {
 function openHistory(type) {
   document.getElementById('history-title').textContent = historyTitles[type] || 'Mi historial';
   document.getElementById('history-overlay').classList.add('open');
+  document.body.style.overflow = 'hidden';
 }
 
 function closeHistory() {
   document.getElementById('history-overlay').classList.remove('open');
+  document.body.style.overflow = '';
 }
 
 function openAuth(mode) {
   document.getElementById('auth-overlay').classList.add('open');
   switchAuth(mode || 'login');
+  document.body.style.overflow = 'hidden';
 }
 
 function closeAuth() {
   document.getElementById('auth-overlay').classList.remove('open');
+  document.body.style.overflow = '';
 }
 
 function switchAuth(mode) {
