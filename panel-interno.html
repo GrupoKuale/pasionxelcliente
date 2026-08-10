@@ -1,0 +1,534 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Panel interno — Pasión Por El Cliente</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ink:#0a0a0a; --ink-soft:#4a4a4a; --ink-faint:#8a8a8a;
+    --paper:#ffffff; --paper-soft:#fafafa;
+    --line:#e7e7e7; --line-soft:#f0f0f0;
+    --pink:#E00086; --pink-soft:#fdeaf5;
+    --radius:10px;
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { font-family:'Manrope',sans-serif; background:var(--paper); color:var(--ink); min-height:100vh; -webkit-font-smoothing:antialiased; }
+
+  /* ===== Topbar ===== */
+  .topbar { display:flex; align-items:center; justify-content:space-between; gap:10px; padding:16px 40px; border-bottom:1px solid var(--line); position:sticky; top:0; background:rgba(255,255,255,0.92); backdrop-filter:blur(8px); z-index:100; }
+  .topbar-brand { display:flex; align-items:center; gap:10px; }
+  .topbar-logo { height:24px; width:auto; display:block; }
+  .topbar-title { font-weight:800; font-size:13.5px; color:var(--ink); }
+  .btn-nav { font-family:'Manrope',sans-serif; font-weight:700; font-size:13px; padding:9px 18px; border-radius:50px; cursor:pointer; transition:all 0.18s; text-decoration:none; display:inline-flex; align-items:center; }
+  .btn-nav-ghost { background:transparent; border:1.5px solid var(--line); color:var(--ink); }
+  .btn-nav-ghost:hover { border-color:var(--ink); }
+  .topbar-user-name { font-size:13px; font-weight:700; color:var(--ink-soft); display:flex; align-items:center; padding:0 4px; }
+  .topbar-actions { display:none; align-items:center; gap:10px; }
+
+  /* ===== Login ===== */
+  .login-view { display:none; min-height:calc(100vh - 58px); align-items:center; justify-content:center; padding:40px 20px; }
+  .login-card { background:var(--paper); border:1.5px solid var(--line); border-radius:16px; width:100%; max-width:380px; padding:40px 32px 34px; box-shadow:0 20px 60px rgba(0,0,0,0.06); }
+  .login-logo { height:32px; width:auto; display:block; margin:0 auto 24px; }
+  .login-title { font-weight:800; font-size:20px; letter-spacing:-0.01em; text-align:center; margin-bottom:6px; }
+  .login-sub { font-size:13px; color:var(--ink-soft); text-align:center; margin-bottom:26px; font-weight:500; line-height:1.5; }
+  .login-error { display:none; background:var(--pink-soft); border:1px solid var(--pink); color:var(--pink); font-size:12.5px; font-weight:700; padding:10px 14px; border-radius:8px; margin-bottom:18px; text-align:center; }
+  .login-hint { font-size:11.5px; color:var(--ink-faint); text-align:center; margin-top:18px; font-weight:600; }
+  .login-back { display:block; text-align:center; font-size:12.5px; font-weight:700; color:var(--ink-faint); text-decoration:none; margin-top:22px; }
+  .login-back:hover { color:var(--pink); }
+
+  /* ===== Shared form bits ===== */
+  .field-group { margin-bottom:18px; }
+  .field-label { display:block; font-size:11.5px; font-weight:700; color:var(--ink); text-transform:uppercase; letter-spacing:0.6px; margin-bottom:8px; }
+  .field-input { width:100%; padding:13px 14px; border:1.5px solid var(--line); border-radius:8px; font-family:'Manrope',sans-serif; font-size:14px; font-weight:500; color:var(--ink); transition:border-color 0.15s; background:var(--paper-soft); }
+  .field-input::placeholder { color:var(--ink-faint); font-weight:500; }
+  .field-input:focus { outline:none; border-color:var(--pink); background:var(--paper); box-shadow:0 0 0 3px var(--pink-soft); }
+  select.field-input { appearance:none; background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8'%3E%3Cpath fill='%238a8a8a' d='M0 0l6 8 6-8z'/%3E%3C/svg%3E"); background-repeat:no-repeat; background-position:right 16px center; padding-right:36px; }
+  textarea.field-input { resize:vertical; min-height:64px; }
+  .btn-primary { width:100%; padding:14px; background:var(--ink); color:white; border:none; border-radius:8px; font-family:'Manrope',sans-serif; font-weight:700; font-size:14px; letter-spacing:0.2px; cursor:pointer; transition:all 0.18s; }
+  .btn-primary:hover { background:var(--pink); }
+
+  /* ===== Board ===== */
+  .board-view { display:none; }
+  .board-wrap { max-width:1400px; margin:0 auto; padding:32px 40px 70px; }
+  .board-title { font-weight:800; font-size:24px; letter-spacing:-0.01em; margin-bottom:6px; }
+  .board-sub { font-size:13.5px; color:var(--ink-soft); font-weight:500; max-width:560px; line-height:1.5; }
+
+  .filter-row { display:flex; gap:8px; flex-wrap:wrap; margin:26px 0 26px; }
+  .filter-chip { background:var(--paper-soft); border:1.5px solid var(--line); border-radius:50px; padding:8px 16px; font-family:'Manrope',sans-serif; font-size:12.5px; font-weight:700; color:var(--ink-soft); cursor:pointer; transition:all .15s; }
+  .filter-chip:hover { border-color:var(--pink); color:var(--ink); }
+  .filter-chip.active { background:var(--ink); border-color:var(--ink); color:#fff; }
+
+  .kanban { display:flex; gap:16px; overflow-x:auto; padding-bottom:10px; align-items:flex-start; }
+  .kanban-col { flex:0 0 280px; display:flex; flex-direction:column; background:var(--paper-soft); border:1px solid var(--line); border-radius:14px; max-height:70vh; min-height:220px; }
+  .kanban-col-head { padding:14px 16px 12px; border-bottom:1px solid var(--line); display:flex; align-items:center; justify-content:space-between; flex-shrink:0; }
+  .kanban-col-title { font-size:12px; font-weight:800; text-transform:uppercase; letter-spacing:0.5px; color:var(--ink); }
+  .kanban-col-count { font-size:11px; font-weight:800; color:var(--ink-faint); background:var(--paper); border:1px solid var(--line); border-radius:50px; padding:2px 8px; }
+  .kanban-col-body { flex:1; overflow-y:auto; padding:12px; display:flex; flex-direction:column; gap:10px; transition:background .15s; }
+  .kanban-col-body.drag-over { background:var(--pink-soft); }
+  .kanban-col-empty { font-size:12px; color:var(--ink-faint); font-weight:600; text-align:center; padding:18px 6px; }
+
+  .kcard { background:var(--paper); border:1.5px solid var(--line); border-radius:10px; padding:12px 14px; cursor:grab; transition:border-color .15s, box-shadow .15s; }
+  .kcard:hover { border-color:var(--pink); box-shadow:0 2px 10px rgba(0,0,0,0.05); }
+  .kcard.dragging { opacity:0.4; }
+  .kcard-tag { display:inline-block; font-size:9.5px; font-weight:800; text-transform:uppercase; letter-spacing:0.4px; color:var(--ink-faint); border:1px solid var(--line); border-radius:5px; padding:3px 6px; margin-bottom:8px; }
+  .kcard-title { font-size:13.5px; font-weight:700; color:var(--ink); line-height:1.35; margin-bottom:6px; }
+  .kcard-meta { font-size:11px; color:var(--ink-faint); font-weight:600; margin-bottom:8px; }
+  .kcard-footer { display:flex; align-items:center; gap:12px; font-size:11px; color:var(--ink-soft); font-weight:700; }
+
+  .status-badge { display:inline-flex; align-items:center; justify-content:center; font-size:10.5px; font-weight:800; padding:6px 12px; border-radius:50px; text-transform:uppercase; letter-spacing:0.4px; white-space:nowrap; }
+  .status-recibida { background:var(--paper-soft); border:1px solid var(--line); color:var(--ink-soft); }
+  .status-revision { background:var(--pink-soft); border:1px solid var(--pink); color:var(--pink); }
+  .status-aprobada { background:var(--ink); color:white; }
+  .status-entregada { background:var(--pink); color:white; }
+  .status-rechazada { background:var(--paper-soft); border:1px solid var(--line); color:var(--ink-faint); }
+
+  /* ===== Modal ===== */
+  .modal-overlay { display:none; position:fixed; inset:0; background:rgba(10,10,10,0.55); backdrop-filter:blur(2px); z-index:200; align-items:center; justify-content:center; padding:20px; }
+  .modal-overlay.open { display:flex; }
+  .modal-box { background:var(--paper); border-radius:16px; width:100%; max-width:480px; max-height:88vh; overflow-y:auto; padding:36px 32px 32px; position:relative; animation:modalIn 0.22s ease both; box-shadow:0 20px 60px rgba(0,0,0,0.25); }
+  @keyframes modalIn { from{opacity:0;transform:translateY(10px) scale(0.98)} to{opacity:1;transform:translateY(0) scale(1)} }
+  .modal-close { position:absolute; top:16px; right:16px; width:30px; height:30px; border-radius:50%; border:none; background:var(--paper-soft); color:var(--ink-soft); font-size:16px; cursor:pointer; display:flex; align-items:center; justify-content:center; transition:background 0.15s; }
+  .modal-close:hover { background:var(--line-soft); }
+  .cm-tag-row { display:flex; gap:8px; align-items:center; margin-bottom:14px; }
+  .cm-title { font-weight:800; font-size:19px; letter-spacing:-0.01em; margin-bottom:4px; }
+  .cm-meta { font-size:12.5px; color:var(--ink-soft); font-weight:600; margin-bottom:22px; }
+  .cm-section-title { font-size:11.5px; font-weight:800; text-transform:uppercase; letter-spacing:0.6px; color:var(--ink); margin:24px 0 10px; }
+  .cm-add-row { display:flex; gap:8px; margin-bottom:6px; }
+  .cm-add-row .field-input { flex:1; }
+  .cm-task-item { display:flex; align-items:center; gap:10px; padding:8px 0; border-bottom:1px solid var(--line-soft); }
+  .cm-task-item input[type=checkbox] { width:16px; height:16px; accent-color:var(--pink); flex-shrink:0; cursor:pointer; }
+  .cm-task-text { flex:1; font-size:13px; font-weight:600; color:var(--ink); }
+  .cm-task-text.done { text-decoration:line-through; color:var(--ink-faint); }
+  .cm-task-del { background:none; border:none; color:var(--ink-faint); cursor:pointer; font-size:15px; padding:2px 6px; line-height:1; }
+  .cm-task-del:hover { color:var(--pink); }
+  .cm-comment { background:var(--paper-soft); border:1px solid var(--line); border-radius:8px; padding:10px 12px; margin-bottom:8px; }
+  .cm-comment-head { display:flex; justify-content:space-between; gap:10px; font-size:11px; font-weight:800; color:var(--ink-faint); margin-bottom:4px; }
+  .cm-comment-text { font-size:13px; color:var(--ink); font-weight:500; line-height:1.5; }
+  .cm-empty { font-size:12.5px; color:var(--ink-faint); font-weight:600; padding:4px 0 14px; }
+
+  @media(max-width:560px){
+    .topbar{padding:14px 20px;}
+    .board-wrap{padding:24px 20px 56px;}
+  }
+</style>
+</head>
+<body>
+
+<nav class="topbar">
+  <div class="topbar-brand">
+    <img class="topbar-logo" src="Logotipo-PasiónPorElCliente-Horizontal.jpg" alt="Pasión Por El Cliente">
+    <span class="topbar-title">Panel interno</span>
+  </div>
+  <div class="topbar-actions" id="topbar-actions">
+    <span class="topbar-user-name" id="topbar-user-name">Hola, Demo</span>
+    <a class="btn-nav btn-nav-ghost" href="index.html">Ir al portal</a>
+    <button class="btn-nav btn-nav-ghost" type="button" onclick="logout()">Cerrar sesión</button>
+  </div>
+</nav>
+
+<!-- ===================== LOGIN ===================== -->
+<div class="login-view" id="login-view">
+  <div class="login-card">
+    <img class="login-logo" src="Logotipo-PasiónPorElCliente-Horizontal.jpg" alt="Pasión Por El Cliente">
+    <div class="login-title">Acceso interno</div>
+    <p class="login-sub">Tablero de seguimiento para el equipo de Pasión Por El Cliente.</p>
+    <div class="login-error" id="login-error">Usuario o contraseña incorrectos.</div>
+    <form onsubmit="return handleLogin(event)">
+      <div class="field-group">
+        <label class="field-label">Usuario</label>
+        <input class="field-input" type="text" id="login-user" autocomplete="username" required>
+      </div>
+      <div class="field-group">
+        <label class="field-label">Contraseña</label>
+        <input class="field-input" type="password" id="login-pass" autocomplete="current-password" required>
+      </div>
+      <button class="btn-primary" type="submit">Entrar</button>
+    </form>
+    <p class="login-hint">Acceso de demostración: usuario <strong>demo</strong> / contraseña <strong>demo</strong>.</p>
+    <a class="login-back" href="index.html">← Volver al portal</a>
+  </div>
+</div>
+
+<!-- ===================== BOARD ===================== -->
+<div class="board-view" id="board-view">
+  <div class="board-wrap">
+    <div class="board-title">Tablero de seguimiento</div>
+    <p class="board-sub">Da seguimiento a las solicitudes de patrocinios, publicidad, vales y alianzas. Arrastra una tarjeta para cambiar su status, o ábrela para agregar comentarios y tareas pendientes.</p>
+
+    <div class="filter-row" id="filter-row">
+      <button class="filter-chip active" data-filter="todos" onclick="setFilter('todos')">Todos <span id="count-todos"></span></button>
+      <button class="filter-chip" data-filter="patrocinios" onclick="setFilter('patrocinios')">Patrocinios <span id="count-patrocinios"></span></button>
+      <button class="filter-chip" data-filter="publicidad" onclick="setFilter('publicidad')">Publicidad <span id="count-publicidad"></span></button>
+      <button class="filter-chip" data-filter="vales" onclick="setFilter('vales')">Vales <span id="count-vales"></span></button>
+      <button class="filter-chip" data-filter="alianzas" onclick="setFilter('alianzas')">Alianzas <span id="count-alianzas"></span></button>
+    </div>
+
+    <div class="kanban" id="kanban"></div>
+  </div>
+</div>
+
+<!-- ===================== CARD DETAIL MODAL ===================== -->
+<div class="modal-overlay" id="card-overlay" onclick="if(event.target===this) closeCard()">
+  <div class="modal-box">
+    <button class="modal-close" type="button" onclick="closeCard()">✕</button>
+    <div class="cm-tag-row" id="cm-tag-row"></div>
+    <div class="cm-title" id="cm-title"></div>
+    <p class="cm-meta" id="cm-meta"></p>
+
+    <div class="field-group">
+      <label class="field-label">Status</label>
+      <select class="field-input" id="cm-status-select" onchange="changeStatus(this.value)"></select>
+    </div>
+
+    <div class="cm-section-title">Tareas pendientes</div>
+    <div id="cm-tasks"></div>
+    <div class="cm-add-row">
+      <input class="field-input" type="text" id="cm-task-input" placeholder="Agregar tarea..." onkeydown="if(event.key==='Enter'){event.preventDefault(); addTask();}">
+      <button class="btn-nav btn-nav-ghost" type="button" onclick="addTask()">Agregar</button>
+    </div>
+
+    <div class="cm-section-title">Comentarios</div>
+    <div id="cm-comments"></div>
+    <div class="cm-add-row" style="margin-top:6px;">
+      <textarea class="field-input" id="cm-comment-input" placeholder="Escribe un comentario..." rows="2"></textarea>
+    </div>
+    <button class="btn-primary" type="button" style="margin-top:10px;" onclick="addComment()">Agregar comentario</button>
+  </div>
+</div>
+
+<script>
+/* ============================================================
+   NOTA PARA CONEXIÓN A BACKEND
+   Este tablero es un borrador funcional que guarda todo en
+   localStorage del navegador (no hay backend todavía). El login
+   demo/demo es solo una compuerta de demostración, no seguridad
+   real. Cuando se conecte a Odoo, el modelo natural es leer/escribir
+   contra el mismo registro (ej. pxc.solicitud) que alimenta el
+   portal de clientes, usando su campo de status y sub-modelos de
+   comentarios/tareas (o mail.message / activity de Odoo).
+   ============================================================ */
+
+const STORAGE_KEY = 'pxc_panel_interno_v1';
+
+const STATUSES = [
+  { key:'recibida',  label:'Recibida',     barColor:'#c9c9c9' },
+  { key:'revision',  label:'En revisión',  barColor:'#E00086' },
+  { key:'aprobada',  label:'Aprobada',     barColor:'#0a0a0a' },
+  { key:'entregada', label:'Entregada',    barColor:'#E00086' },
+  { key:'rechazada', label:'No aprobada',  barColor:'#8a8a8a' }
+];
+const STATUS_MAP = Object.fromEntries(STATUSES.map(s => [s.key, s]));
+
+const RUBROS = {
+  patrocinios: 'Patrocinio',
+  publicidad: 'Publicidad',
+  vales: 'Vales',
+  alianzas: 'Alianza'
+};
+
+function seedRequests() {
+  return [
+    { id:'r1', rubro:'patrocinios', title:'Torneo Regional de Voleibol 2026', brand:"Carl's Jr.", folio:'PXC-PAT-0148', date:'12 jul 2026', status:'revision',
+      tasks:[ {text:'Confirmar presupuesto con la marca', done:false}, {text:'Responder al solicitante', done:false} ],
+      comments:[ {author:'Demo', date:'12 jul 2026', text:'Solicitud recibida por correo, pendiente validar con el equipo de marca.'} ] },
+    { id:'r2', rubro:'publicidad', title:'Spot de radio — campaña de verano', brand:'Dairy Queen', folio:'PXC-PUB-0091', date:'02 jul 2026', status:'aprobada',
+      tasks:[ {text:'Coordinar grabación del spot', done:true} ], comments:[] },
+    { id:'r3', rubro:'vales', title:'50 vales × $200 MXN', brand:"Carl's Jr.", folio:'PXC-VAL-0212', date:'28 jun 2026', status:'entregada',
+      tasks:[], comments:[ {author:'Demo', date:'29 jun 2026', text:'Vales entregados en oficina de Tampico.'} ] },
+    { id:'r4', rubro:'alianzas', title:'Alianza con universidad local', brand:'Dairy Queen', folio:'PXC-ALZ-0034', date:'15 jun 2026', status:'recibida',
+      tasks:[ {text:'Agendar llamada con coordinación académica', done:false} ], comments:[] },
+    { id:'r5', rubro:'patrocinios', title:'Carrera 5K Altamira', brand:"Carl's Jr.", folio:'PXC-PAT-0102', date:'30 may 2026', status:'rechazada',
+      tasks:[], comments:[ {author:'Demo', date:'31 may 2026', text:'No cumple con la política de patrocinios deportivos del trimestre.'} ] },
+    { id:'r6', rubro:'publicidad', title:'Colaboración con influencer local', brand:"Carl's Jr.", folio:'PXC-PUB-0102', date:'20 jul 2026', status:'recibida',
+      tasks:[], comments:[] },
+    { id:'r7', rubro:'vales', title:'20 vales × $100 MXN', brand:'Dairy Queen', folio:'PXC-VAL-0233', date:'18 jul 2026', status:'revision',
+      tasks:[ {text:'Validar forma de pago (transferencia)', done:false} ], comments:[] },
+    { id:'r8', rubro:'alianzas', title:'Co-marketing con gimnasio Fit Zone', brand:"Carl's Jr.", folio:'PXC-ALZ-0041', date:'22 jul 2026', status:'aprobada',
+      tasks:[ {text:'Firmar convenio', done:false}, {text:'Definir fecha de lanzamiento', done:false} ], comments:[] },
+    { id:'r9', rubro:'patrocinios', title:'Festival Cultural Ciudad Victoria', brand:'Dairy Queen', folio:'PXC-PAT-0155', date:'25 jul 2026', status:'entregada',
+      tasks:[], comments:[ {author:'Demo', date:'26 jul 2026', text:'Banners entregados, patrocinio confirmado para el evento.'} ] },
+    { id:'r10', rubro:'publicidad', title:'Espectacular en carretera Tampico-Altamira', brand:"Carl's Jr.", folio:'PXC-PUB-0110', date:'05 ago 2026', status:'revision',
+      tasks:[], comments:[] }
+  ];
+}
+
+function loadRequests() {
+  const raw = localStorage.getItem(STORAGE_KEY);
+  if (raw) {
+    try { return JSON.parse(raw); } catch (e) { /* datos corruptos, se re-siembra abajo */ }
+  }
+  const seeded = seedRequests();
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(seeded));
+  return seeded;
+}
+
+function saveData() {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(requests));
+}
+
+let requests = loadRequests();
+let currentFilter = 'todos';
+let openCardId = null;
+
+function escapeHtml(str) {
+  const div = document.createElement('div');
+  div.textContent = str == null ? '' : String(str);
+  return div.innerHTML;
+}
+
+function formatTodayEs() {
+  return new Date().toLocaleDateString('es-MX', { day:'2-digit', month:'short', year:'numeric' }).replace('.', '');
+}
+
+/* ===== Login ===== */
+function handleLogin(evt) {
+  evt.preventDefault();
+  const u = document.getElementById('login-user').value.trim();
+  const p = document.getElementById('login-pass').value;
+  const err = document.getElementById('login-error');
+  if (u === 'demo' && p === 'demo') {
+    err.style.display = 'none';
+    sessionStorage.setItem('pxc_interno_auth', '1');
+    showBoard();
+  } else {
+    err.style.display = 'block';
+  }
+  return false;
+}
+
+function logout() {
+  sessionStorage.removeItem('pxc_interno_auth');
+  showLogin();
+}
+
+function showLogin() {
+  document.getElementById('login-view').style.display = 'flex';
+  document.getElementById('board-view').style.display = 'none';
+  document.getElementById('topbar-actions').style.display = 'none';
+}
+
+function showBoard() {
+  document.getElementById('login-view').style.display = 'none';
+  document.getElementById('board-view').style.display = 'block';
+  document.getElementById('topbar-actions').style.display = 'flex';
+  renderBoard();
+}
+
+/* ===== Filtros ===== */
+function setFilter(f) {
+  currentFilter = f;
+  document.querySelectorAll('.filter-chip').forEach(c => c.classList.toggle('active', c.dataset.filter === f));
+  renderBoard();
+}
+
+function updateFilterCounts() {
+  const counts = { todos: requests.length, patrocinios:0, publicidad:0, vales:0, alianzas:0 };
+  requests.forEach(r => { counts[r.rubro] = (counts[r.rubro] || 0) + 1; });
+  Object.keys(counts).forEach(k => {
+    const el = document.getElementById('count-' + k);
+    if (el) el.textContent = '(' + counts[k] + ')';
+  });
+}
+
+/* ===== Tablero ===== */
+function renderBoard() {
+  updateFilterCounts();
+  const kanban = document.getElementById('kanban');
+  const visible = requests.filter(r => currentFilter === 'todos' || r.rubro === currentFilter);
+
+  kanban.innerHTML = STATUSES.map(status => {
+    const cards = visible.filter(r => r.status === status.key);
+    const cardsHtml = cards.length
+      ? cards.map(cardHtml).join('')
+      : '<div class="kanban-col-empty">Sin solicitudes</div>';
+    return `
+      <div class="kanban-col" data-status="${status.key}" style="border-top:3px solid ${status.barColor}">
+        <div class="kanban-col-head">
+          <span class="kanban-col-title">${status.label}</span>
+          <span class="kanban-col-count">${cards.length}</span>
+        </div>
+        <div class="kanban-col-body">${cardsHtml}</div>
+      </div>`;
+  }).join('');
+}
+
+function cardHtml(r) {
+  const done = r.tasks.filter(t => t.done).length;
+  return `
+    <div class="kcard" draggable="true" data-id="${r.id}">
+      <span class="kcard-tag">${RUBROS[r.rubro]}</span>
+      <div class="kcard-title">${escapeHtml(r.title)}</div>
+      <div class="kcard-meta">${escapeHtml(r.brand)} · Folio ${escapeHtml(r.folio)} · ${escapeHtml(r.date)}</div>
+      <div class="kcard-footer">
+        <span>💬 ${r.comments.length}</span>
+        <span>☑ ${done}/${r.tasks.length}</span>
+      </div>
+    </div>`;
+}
+
+/* ===== Drag & drop (delegado sobre #kanban, que no se re-crea entre renders) ===== */
+document.addEventListener('DOMContentLoaded', () => {
+  const kanban = document.getElementById('kanban');
+
+  kanban.addEventListener('dragstart', e => {
+    const card = e.target.closest('.kcard');
+    if (!card) return;
+    e.dataTransfer.effectAllowed = 'move';
+    e.dataTransfer.setData('text/plain', card.dataset.id);
+    card.classList.add('dragging');
+  });
+
+  kanban.addEventListener('dragend', e => {
+    const card = e.target.closest('.kcard');
+    if (card) card.classList.remove('dragging');
+  });
+
+  kanban.addEventListener('dragover', e => {
+    const body = e.target.closest('.kanban-col-body');
+    if (!body) return;
+    e.preventDefault();
+    body.classList.add('drag-over');
+  });
+
+  kanban.addEventListener('dragleave', e => {
+    const body = e.target.closest('.kanban-col-body');
+    if (body) body.classList.remove('drag-over');
+  });
+
+  kanban.addEventListener('drop', e => {
+    const body = e.target.closest('.kanban-col-body');
+    if (!body) return;
+    e.preventDefault();
+    body.classList.remove('drag-over');
+    const id = e.dataTransfer.getData('text/plain');
+    const newStatus = body.closest('.kanban-col').dataset.status;
+    const req = requests.find(r => r.id === id);
+    if (req && req.status !== newStatus) {
+      req.status = newStatus;
+      saveData();
+      renderBoard();
+    }
+  });
+
+  kanban.addEventListener('click', e => {
+    const card = e.target.closest('.kcard');
+    if (card) openCard(card.dataset.id);
+  });
+
+  if (sessionStorage.getItem('pxc_interno_auth') === '1') {
+    showBoard();
+  } else {
+    showLogin();
+  }
+});
+
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeCard(); });
+
+/* ===== Modal de detalle ===== */
+function openCard(id) {
+  openCardId = id;
+  renderCardModal();
+  document.getElementById('card-overlay').classList.add('open');
+}
+
+function closeCard() {
+  document.getElementById('card-overlay').classList.remove('open');
+  openCardId = null;
+}
+
+function currentRequest() {
+  return requests.find(r => r.id === openCardId);
+}
+
+function renderCardModal() {
+  const r = currentRequest();
+  if (!r) return;
+
+  document.getElementById('cm-tag-row').innerHTML =
+    `<span class="kcard-tag">${RUBROS[r.rubro]}</span>
+     <span class="status-badge status-${r.status}">${STATUS_MAP[r.status].label}</span>`;
+
+  document.getElementById('cm-title').textContent = r.title;
+  document.getElementById('cm-meta').textContent = `${r.brand} · Folio ${r.folio} · Enviada ${r.date}`;
+
+  const select = document.getElementById('cm-status-select');
+  select.innerHTML = STATUSES.map(s => `<option value="${s.key}" ${s.key === r.status ? 'selected' : ''}>${s.label}</option>`).join('');
+
+  const tasksEl = document.getElementById('cm-tasks');
+  tasksEl.innerHTML = r.tasks.length
+    ? r.tasks.map((t, i) => `
+        <div class="cm-task-item">
+          <input type="checkbox" ${t.done ? 'checked' : ''} onchange="toggleTask(${i})">
+          <span class="cm-task-text ${t.done ? 'done' : ''}">${escapeHtml(t.text)}</span>
+          <button class="cm-task-del" type="button" onclick="deleteTask(${i})" aria-label="Eliminar tarea">✕</button>
+        </div>`).join('')
+    : '<p class="cm-empty">No hay tareas pendientes.</p>';
+
+  const commentsEl = document.getElementById('cm-comments');
+  commentsEl.innerHTML = r.comments.length
+    ? r.comments.map(c => `
+        <div class="cm-comment">
+          <div class="cm-comment-head"><span>${escapeHtml(c.author)}</span><span>${escapeHtml(c.date)}</span></div>
+          <div class="cm-comment-text">${escapeHtml(c.text)}</div>
+        </div>`).join('')
+    : '<p class="cm-empty">Aún no hay comentarios.</p>';
+}
+
+function changeStatus(newStatus) {
+  const r = currentRequest();
+  if (!r) return;
+  r.status = newStatus;
+  saveData();
+  renderCardModal();
+  renderBoard();
+}
+
+function addTask() {
+  const r = currentRequest();
+  if (!r) return;
+  const input = document.getElementById('cm-task-input');
+  const text = input.value.trim();
+  if (!text) return;
+  r.tasks.push({ text, done:false });
+  input.value = '';
+  saveData();
+  renderCardModal();
+  renderBoard();
+}
+
+function toggleTask(idx) {
+  const r = currentRequest();
+  if (!r) return;
+  r.tasks[idx].done = !r.tasks[idx].done;
+  saveData();
+  renderCardModal();
+  renderBoard();
+}
+
+function deleteTask(idx) {
+  const r = currentRequest();
+  if (!r) return;
+  r.tasks.splice(idx, 1);
+  saveData();
+  renderCardModal();
+  renderBoard();
+}
+
+function addComment() {
+  const r = currentRequest();
+  if (!r) return;
+  const input = document.getElementById('cm-comment-input');
+  const text = input.value.trim();
+  if (!text) return;
+  r.comments.push({ author:'Demo', date: formatTodayEs(), text });
+  input.value = '';
+  saveData();
+  renderCardModal();
+  renderBoard();
+}
+</script>
+</body>
+</html>
